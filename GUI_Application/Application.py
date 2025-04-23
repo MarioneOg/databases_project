@@ -1,9 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash
 import mysql.connector
 from mysql.connector import Error
 import datetime
-import os
-from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = 'social_media_analysis_key'
@@ -58,7 +56,7 @@ def list_social_media():
         cursor.close()
         conn.close()
         return render_template('social_media.html', social_media=social_media)
-    flash("Database connection error", "error")
+    flash("Database connection error", "danger")
     return redirect(url_for('index'))
 
 @app.route('/social_media/add', methods=['GET', 'POST'])
@@ -74,13 +72,13 @@ def add_social_media():
                 conn.commit()
                 flash(f"Social media '{media_name}' added successfully", "success")
             except Error as e:
-                flash(f"Error adding social media: {e}", "error")
+                flash(f"Error adding social media: {e}", "danger")
             
             cursor.close()
             conn.close()
             return redirect(url_for('list_social_media'))
         
-        flash("Database connection error", "error")
+        flash("Database connection error", "danger")
     
     return render_template('add_social_media.html')
 
@@ -100,7 +98,7 @@ def list_projects():
         cursor.close()
         conn.close()
         return render_template('projects.html', projects=projects)
-    flash("Database connection error", "error")
+    flash("Database connection error", "danger")
     return redirect(url_for('index'))
 
 @app.route('/projects/add', methods=['GET', 'POST'])
@@ -155,7 +153,7 @@ def add_project():
             flash("Project added successfully", "success")
             return redirect(url_for('list_projects'))
         
-        flash("Database connection error", "error")
+        flash("Database connection error", "danger")
     
     # GET request
     conn = get_db_connection()
@@ -167,7 +165,7 @@ def add_project():
         conn.close()
         return render_template('add_project.html', institutes=institutes)
     
-    flash("Database connection error", "error")
+    flash("Database connection error", "danger")
     return redirect(url_for('index'))
 
 @app.route('/projects/<int:project_id>', methods=['GET'])
@@ -187,7 +185,7 @@ def view_project(project_id):
         project = cursor.fetchone()
         
         if not project:
-            flash("Project not found", "error")
+            flash("Project not found", "danger")
             return redirect(url_for('list_projects'))
         
         # Get project fields
@@ -240,7 +238,7 @@ def view_project(project_id):
         return render_template('view_project.html', project=project, fields=fields, 
                                posts=posts, field_stats=field_stats)
     
-    flash("Database connection error", "error")
+    flash("Database connection error", "danger")
     return redirect(url_for('list_projects'))
 
 # User Management
@@ -259,7 +257,7 @@ def list_users():
         cursor.close()
         conn.close()
         return render_template('users.html', users=users)
-    flash("Database connection error", "error")
+    flash("Database connection error", "danger")
     return redirect(url_for('index'))
 
 @app.route('/users/add', methods=['GET', 'POST'])
@@ -304,13 +302,13 @@ def add_user():
                 conn.commit()
                 flash("User added successfully", "success")
             except Error as e:
-                flash(f"Error adding user: {e}", "error")
+                flash(f"Error adding user: {e}", "danger")
             
             cursor.close()
             conn.close()
             return redirect(url_for('list_users'))
         
-        flash("Database connection error", "error")
+        flash("Database connection error", "danger")
     
     # GET request
     conn = get_db_connection()
@@ -322,7 +320,7 @@ def add_user():
         conn.close()
         return render_template('add_user.html', social_media=social_media)
     
-    flash("Database connection error", "error")
+    flash("Database connection error", "danger")
     return redirect(url_for('index'))
 
 # Post Management
@@ -349,7 +347,7 @@ def list_posts():
         cursor.close()
         conn.close()
         return render_template('posts.html', posts=posts)
-    flash("Database connection error", "error")
+    flash("Database connection error", "danger")
     return redirect(url_for('index'))
 
 @app.route('/posts/add', methods=['GET', 'POST'])
@@ -379,7 +377,7 @@ def add_post():
             user_info = cursor.fetchone()
             
             if not user_info:
-                flash(f"User {username} on {media_name} not found", "error")
+                flash(f"User {username} on {media_name} not found", "danger")
                 cursor.close()
                 conn.close()
                 return redirect(url_for('add_post'))
@@ -430,14 +428,14 @@ def add_post():
             conn.close()
             return redirect(url_for('list_posts'))
         
-        flash("Database connection error", "error")
+        flash("Database connection error", "danger")
     
     # GET request
     conn = get_db_connection()
     if conn:
         cursor = conn.cursor(dictionary=True)
         cursor.execute("""
-            SELECT u.user_id, u.username, sm.media_name
+            SELECT u.username, sm.media_name
             FROM users u
             JOIN social_media sm ON u.media_id = sm.media_id
         """)
@@ -450,7 +448,7 @@ def add_post():
         conn.close()
         return render_template('add_post.html', users=users, projects=projects)
     
-    flash("Database connection error", "error")
+    flash("Database connection error", "danger")
     return redirect(url_for('index'))
 
 @app.route('/posts/<int:post_id>', methods=['GET'])
@@ -471,7 +469,7 @@ def view_post(post_id):
         post = cursor.fetchone()
         
         if not post:
-            flash("Post not found", "error")
+            flash("Post not found", "danger")
             return redirect(url_for('list_posts'))
         
         # Get reposts
@@ -508,7 +506,7 @@ def view_post(post_id):
         
         return render_template('view_post.html', post=post, reposts=reposts, projects=projects)
     
-    flash("Database connection error", "error")
+    flash("Database connection error", "danger")
     return redirect(url_for('list_posts'))
 
 @app.route('/posts/repost', methods=['POST'])
@@ -531,7 +529,7 @@ def add_repost():
         user_result = cursor.fetchone()
         
         if not user_result:
-            flash(f"User {username} on {media_name} not found", "error")
+            flash(f"User {username} on {media_name} not found", "danger")
             cursor.close()
             conn.close()
             return redirect(url_for('view_post', post_id=post_id))
@@ -551,7 +549,7 @@ def add_repost():
         flash("Repost added successfully", "success")
         return redirect(url_for('view_post', post_id=post_id))
     
-    flash("Database connection error", "error")
+    flash("Database connection error", "danger")
     return redirect(url_for('view_post', post_id=post_id))
 
 # Analysis Results
@@ -609,14 +607,14 @@ def add_analysis():
             flash("Analysis results saved successfully", "success")
             return redirect(url_for('view_project', project_id=project_id))
         
-        flash("Database connection error", "error")
+        flash("Database connection error", "danger")
     
     # GET request
     project_id = request.args.get('project_id')
     post_id = request.args.get('post_id')
     
     if not project_id or not post_id:
-        flash("Missing project or post information", "error")
+        flash("Missing project or post information", "danger")
         return redirect(url_for('index'))
     
     conn = get_db_connection()
@@ -628,7 +626,7 @@ def add_analysis():
         project = cursor.fetchone()
         
         if not project:
-            flash("Project not found", "error")
+            flash("Project not found", "danger")
             cursor.close()
             conn.close()
             return redirect(url_for('index'))
@@ -644,7 +642,7 @@ def add_analysis():
         post = cursor.fetchone()
         
         if not post:
-            flash("Post not found", "error")
+            flash("Post not found", "danger")
             cursor.close()
             conn.close()
             return redirect(url_for('view_project', project_id=project_id))
@@ -660,14 +658,14 @@ def add_analysis():
             WHERE project_id = %s AND post_id = %s
         """, (project_id, post_id))
         existing_results = {result['field_id']: result['result_value'] for result in cursor.fetchall()}
-        
+
         cursor.close()
         conn.close()
         
         return render_template('add_analysis.html', project=project, post=post, 
                                fields=fields, existing_results=existing_results)
     
-    flash("Database connection error", "error")
+    flash("Database connection error", "danger")
     return redirect(url_for('index'))
 
 # Query Routes
@@ -740,7 +738,7 @@ def query_posts():
                                   end_date=end_date, username=username, 
                                   first_name=first_name, last_name=last_name)
         
-        flash("Database connection error", "error")
+        flash("Database connection error", "danger")
     
     # GET request or failed query
     conn = get_db_connection()
@@ -752,7 +750,7 @@ def query_posts():
         conn.close()
         return render_template('query_posts.html', social_media=social_media)
     
-    flash("Database connection error", "error")
+    flash("Database connection error", "danger")
     return redirect(url_for('index'))
 
 @app.route('/query/project', methods=['GET', 'POST'])
@@ -775,7 +773,7 @@ def query_project():
             project = cursor.fetchone()
             
             if not project:
-                flash("Project not found", "error")
+                flash("Project not found", "danger")
                 cursor.close()
                 conn.close()
                 return redirect(url_for('query_project'))
@@ -829,7 +827,7 @@ def query_project():
             return render_template('query_project_results.html', project=project, 
                                   fields=fields, posts=posts, field_stats=field_stats)
         
-        flash("Database connection error", "error")
+        flash("Database connection error", "danger")
     
     # GET request or failed query
     conn = get_db_connection()
@@ -841,7 +839,7 @@ def query_project():
         conn.close()
         return render_template('query_project.html', projects=projects)
     
-    flash("Database connection error", "error")
+    flash("Database connection error", "danger")
     return redirect(url_for('index'))
 
 @app.route('/query/posts_experiments', methods=['GET', 'POST'])
@@ -987,7 +985,7 @@ def query_posts_experiments():
                                   end_date=end_date, username=username, 
                                   first_name=first_name, last_name=last_name)
         
-        flash("Database connection error", "error")
+        flash("Database connection error", "danger")
     
     # GET request or failed query
     conn = get_db_connection()
@@ -999,7 +997,7 @@ def query_posts_experiments():
         conn.close()
         return render_template('query_posts_experiments.html', social_media=social_media)
     
-    flash("Database connection error", "error")
+    flash("Database connection error", "danger")
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
