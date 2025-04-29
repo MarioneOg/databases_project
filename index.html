@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Database</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+    <header>
+        <h1>Social Media Database</h1>
+    </header>
+
+    <main id="content">
+        <section id="data-entry" class="page active">
+            <h2>Data Entry</h2>
+        </section>
+
+        <section id="query" class="page">
+            <h2>Query</h2>
+        </section>
+
+        <section id="query" class="page">
+            <h2>Results</h2>
+        </section>
+    </main>
+
+    <nav class="navbar">
+        <button onclick="navigateTo('data-entry')">Data Entry</button>
+        <button onclick="navigateTo('query')">Query</button>
+        <button onclick="navigateTo('results')">Results</button>
+    </nav>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
