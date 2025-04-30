@@ -6,3 +6,5 @@ function navigateTo(pageId) {
 
     document.getElementById(pageId).classList.add('active');
 }
+
+

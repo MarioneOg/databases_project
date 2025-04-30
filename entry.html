@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Data Entry</title>
+    <link rel="stylesheet" href="css/entry.css" />
+</head>
+
+<body>
+    <header>Data Entry</header>
+    <main>
+        <div class="button-group">
+            <button class="entry-button" id="project-btn">Add Project</button>
+            <button class="entry-button" id="posts-btn">Add Posts to Project</button>
+            <button class="entry-button" id="analysis-btn">Add Analysis Result</button>
+        </div>
+
+        <div id="project-form" class="form-section hidden">
+            <input type="text" placeholder="Project Name" class="form-input" />
+            <input type="text" placeholder="Project Manager First Name" class="form-input" />
+            <input type="text" placeholder="Project Manager Last Name" class="form-input" />
+            <input type="text" placeholder="Institute Name" class="form-input" />
+            <input type="text" placeholder="Start Date (mm/dd/yyyy)" class="form-input" />
+            <input type="text" placeholder="End Date (mm/dd/yyyy)" class="form-input" />
+            <!-- <label class="form-label">Start Date</label> -->
+            <!-- <div class="date-row">
+                <input type="text" placeholder="MM" class="date-input" maxlength="2">
+                <input type="text" placeholder="DD" class="date-input" maxlength="2">
+                <input type="text" placeholder="YYYY" class="date-input" maxlength="4">
+            </div>
+            <label class="form-label">End Date</label>
+            <div class="date-row">
+                <input type="text" placeholder="MM" class="date-input" maxlength="2">
+                <input type="text" placeholder="DD" class="date-input" maxlength="2">
+                <input type="text" placeholder="YYYY" class="date-input" maxlength="4">
+            </div> -->
+
+        </div>
+
+        <div id="post-form" class="form-section hidden">
+            <h3 class="form-subheader">Project</h3>
+            <input type="text" placeholder="Project Name" class="form-input" />
+          
+            <h3 class="form-subheader">User Info</h3>
+            <input type="text" placeholder="Username" class="form-input" />
+            <input type="text" placeholder="Social Media" class="form-input" />
+            <input type="text" placeholder="First Name" class="form-input" />
+            <input type="text" placeholder="Last Name" class="form-input" />
+            <input type="text" placeholder="Country of Birth" class="form-input" />
+            <input type="text" placeholder="Country of Residence" class="form-input" />
+            <input type="text" placeholder="Age" class="form-input" />
+            <input type="text" placeholder="Gender" class="form-input" />
+            <input type="text" placeholder="Verified (Yes/No)" class="form-input" />
+          
+            <h3 class="form-subheader">Original Post</h3>
+            <input type="text" placeholder="Time of Post" class="form-input" />
+            <input type="text" placeholder="Text of Post" class="form-input" />
+            <input type="text" placeholder="Likes" class="form-input" />
+            <input type="text" placeholder="Dislikes" class="form-input" />
+            <input type="text" placeholder="City" class="form-input" />
+            <input type="text" placeholder="State" class="form-input" />
+            <input type="text" placeholder="Country" class="form-input" />
+            <input type="text" placeholder="Contains Multimedia (Yes/No)" class="form-input" />
+          
+            <h3 class="form-subheader">Repost</h3>
+            <input type="text" placeholder="Reposter's Username" class="form-input" />
+            <input type="text" placeholder="Reposter's Social Media" class="form-input" />
+            <input type="text" placeholder="Repost Time" class="form-input" />
+            <input type="text" placeholder="Repost City" class="form-input" />
+            <input type="text" placeholder="Repost State" class="form-input" />
+            <input type="text" placeholder="Repost Country" class="form-input" />
+            <input type="text" placeholder="Repost Likes" class="form-input" />
+            <input type="text" placeholder="Repost Dislikes" class="form-input" />
+            <input type="text" placeholder="Repost Has Multimedia (Yes/No)" class="form-input" />
+
+            <button class="submit-btn">Add</button>
+
+        </div>
+
+        <div id="analysis-form" class="form-section hidden">
+            <input type="text" placeholder="Project Name" class="form-input" />
+            <input type="text" placeholder="Post Username" class="form-input" />
+            <input type="text" placeholder="Post Social Media" class="form-input" />
+            <input type="text" placeholder="Time of Post" class="form-input" />
+            <input type="text" placeholder="Field Name" class="form-input" />
+            <input type="text" placeholder="Analysis / Result" class="form-input" />
+            <button class="submit-btn">Add</button>
+        </div>
+          
+          
+          
+    </main>
+
+    <nav class="navbar">
+        <a href="entry.html" class="nav-button">Data Entry</a>
+        <button onclick="navigateTo('query')">Query</button>
+        <button onclick="navigateTo('results')">Results</button>
+    </nav>
+
+    <script src="js/entry.js"></script>
+
+</body>
+</html>
