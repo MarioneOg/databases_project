@@ -17,11 +17,12 @@
     </main>
 
     <nav class="navbar">
-        <a href="http://127.0.0.1:5000/entry" class="nav-button">Data Entry</a>
-        <a href="http://127.0.0.1:5000/query" class="nav-button">Query</a>
-        <a href="http://127.0.0.1:5000/results" class="nav-button">Results</a>
+        <a href="{{ url_for('entry') }}" class="nav-button">Data Entry</a>
+        <a href="{{ url_for('query') }}" class="nav-button">Query</a>
+        <a href="{{ url_for('results') }}" class="nav-button">Results</a>
     </nav>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
+
