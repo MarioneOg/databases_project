@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Social Media Database</title>
-    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 
 <body>
@@ -13,26 +13,15 @@
     </header>
 
     <main id="content">
-        <!-- <section id="data-entry" class="page active">
-            <h2>Data Entry</h2>
-        </section>
-
-        <section id="query" class="page">
-            <h2>Query</h2>
-        </section>
-
-        <section id="results" class="page">
-            <h2>Results</h2>
-        </section> -->
+        <!-- This space can be used dynamically with JavaScript or Flask includes -->
     </main>
 
     <nav class="navbar">
-        <a href="entry.html" class="nav-button">Data Entry</a>
-        <a href="query.html" class="nav-button">Query</a>
-        <a href="results.html" class="nav-button">Results</a>
+        <a href="http://127.0.0.1:5000/entry" class="nav-button">Data Entry</a>
+        <a href="http://127.0.0.1:5000/query" class="nav-button">Query</a>
+        <a href="http://127.0.0.1:5000/results" class="nav-button">Results</a>
     </nav>
-    
 
-    <script src="js/script.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>

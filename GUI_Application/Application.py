@@ -40,6 +40,18 @@ def get_db_connection():
 def index():
     return render_template('index.html')
 
+@app.route('/entry')
+def entry():
+    return render_template('entry.html')
+
+@app.route('/query')
+def query():
+    return render_template('query.html')
+
+@app.route('/results')
+def results():
+    return render_template('results.html')
+
 # Data Entry Routes
 @app.route('/data_entry')
 def data_entry():
