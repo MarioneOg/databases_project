@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Query</title>
+    <link rel="stylesheet" href="css/main.css" />
+</head>
+
+<body>
+    <header>Query</header>
+    <main>
+        <div class="button-group">
+            <button class="entry-button" id="project-btn">Find Post</button>
+            <button class="entry-button" id="posts-btn">Find Experiment</button>
+        </div>
+
+        <div id="post-form" class="form-section hidden">
+            <input type="text" id="social-media" placeholder="Social Media" class="form-input" />
+            <input type="text" id="start-date" placeholder="Start-Date (mm/dd/yyyy)" class="form-input" />
+            <input type="text" id="end-date" placeholder="End Date (mm/dd/yyyy)" class="form-input" />
+            <input type="text" id="username" placeholder="Username" class="form-input" />
+            <input type="text" id="first-name" placeholder="First Name" class="form-input" />
+            <input type="text" id="last-name" placeholder="Last Name" class="form-input" />
+            <button id="submit-post-btn" class="submit-btn">Search</button>
+
+        </div>
+
+        <div id="experiment-form" class="form-section hidden">
+            <input type="text" id="Experiment Name" class="form-input" />
+            <button id="submit-exp-btn" class="submit-btn">Search</button>
+
+        </div>
+
+
+
+          
+    </main>
+
+    <nav class="navbar">
+        <a href="entry.html" class="nav-button">Data Entry</a>
+        <a href="query.html" class="nav-button">Query</a>
+        <a href="results.html" class="nav-button">Results</a>
+    </nav>
+
+    <script src="js/query.js"></script>
+
+</body>
+</html>
