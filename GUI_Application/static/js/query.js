@@ -54,7 +54,7 @@ document.getElementById("submit-post-btn").addEventListener("click", async () =>
             results: data
         }));
   
-        window.location.href = "{{ url_for('results') }}";
+        window.location.href = "/results";
     } catch (err) {
         console.error("Failed to fetch results:", err);
         alert("An error occurred while querying the backend.");
@@ -79,7 +79,7 @@ document.getElementById("submit-exp-btn").addEventListener("click", async () => 
             posts: data.posts
         }));
   
-        window.location.href = "results.html";
+        window.location.href = "/results";
     } catch (err) {
         console.error("Failed to fetch experiment data:", err);
         alert("Error querying experiment.");
