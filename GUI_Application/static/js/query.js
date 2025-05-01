@@ -54,7 +54,7 @@ document.getElementById("submit-post-btn").addEventListener("click", async () =>
             results: data
         }));
   
-        window.location.href = "results.html";
+        window.location.href = "{{ url_for('results') }}";
     } catch (err) {
         console.error("Failed to fetch results:", err);
         alert("An error occurred while querying the backend.");
