@@ -765,6 +765,76 @@ def query_posts():
     flash("Database connection error", "danger")
     return redirect(url_for('index'))
 
+from flask import jsonify
+
+@app.route('/search-posts', methods=['GET'])
+def search_posts():
+    media_name = request.args.get('socialMedia')
+    start_date = request.args.get('startDate')
+    end_date = request.args.get('endDate')
+    username = request.args.get('username')
+    first_name = request.args.get('firstName')
+    last_name = request.args.get('lastName')
+
+    query = """
+        SELECT p.post_id, p.post_text, sm.media_name, u.username, p.post_time
+        FROM posts p
+        JOIN users u ON p.user_id = u.user_id
+        JOIN social_media sm ON p.media_id = sm.media_id
+        WHERE 1=1
+    """
+    params = []
+
+    if media_name:
+        query += " AND sm.media_name = %s"
+        params.append(media_name)
+
+    if start_date:
+        query += " AND p.post_time >= %s"
+        params.append(start_date)
+
+    if end_date:
+        query += " AND p.post_time <= %s"
+        params.append(end_date)
+
+    if username:
+        query += " AND u.username = %s"
+        params.append(username)
+
+    if first_name:
+        query += " AND u.first_name = %s"
+        params.append(first_name)
+
+    if last_name:
+        query += " AND u.last_name = %s"
+        params.append(last_name)
+
+    conn = get_db_connection()
+    if conn:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(query, params)
+        posts = cursor.fetchall()
+
+        # Get projects for each post
+        for post in posts:
+            cursor.execute("""
+                SELECT p.project_name
+                FROM projects p
+                JOIN project_posts pp ON p.project_id = pp.project_id
+                WHERE pp.post_id = %s
+            """, (post['post_id'],))
+            projects = cursor.fetchall()
+            post['projects'] = [project['project_name'] for project in projects]
+
+        cursor.close()
+        conn.close()
+
+        return jsonify(posts)
+
+    return jsonify({'error': 'Database connection error'}), 500
+
+
+
 @app.route('/query/project', methods=['GET', 'POST'])
 def query_project():
     if request.method == 'POST':
