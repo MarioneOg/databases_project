@@ -31,6 +31,13 @@ document.getElementById("submit-post-btn").addEventListener("click", async () =>
     const socialMedia = document.getElementById("social-media").value.trim();
     const startDate = document.getElementById("start-date").value.trim();
     const endDate = document.getElementById("end-date").value.trim();
+
+    if (new Date(endDate) < new Date(startDate)) {
+        event.preventDefault();  // Prevent form submission
+        alert("End date cannot be earlier than the start date.");
+        return;
+    }
+    
     const username = document.getElementById("username").value.trim();
     const firstName = document.getElementById("first-name").value.trim();
     const lastName = document.getElementById("last-name").value.trim();
