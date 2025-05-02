@@ -27,7 +27,7 @@ buttons.forEach(button => {
   
 
 // Query a post
-document.getElementById("submit-post-btn").addEventListener("click", async () => {
+document.getElementById("submit-post-btn").addEventListener("click", async (event) => {
     const socialMedia = document.getElementById("social-media").value.trim();
     const startDate = document.getElementById("start-date").value.trim();
     const endDate = document.getElementById("end-date").value.trim();
@@ -70,7 +70,7 @@ document.getElementById("submit-post-btn").addEventListener("click", async () =>
   
 
 // Query an experiment
-document.getElementById("submit-exp-btn").addEventListener("click", async () => {
+document.getElementById("submit-exp-btn").addEventListener("click", async (event) => {
     const experimentName = document.getElementById("experiment-name").value.trim();
   
     try {
