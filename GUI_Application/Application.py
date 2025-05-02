@@ -1084,3 +1084,130 @@ def query_posts_experiments():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+@app.route('/experiment_query', methods=['GET', 'POST'])
+def experiment_query():
+    if request.method == 'POST':
+        experiment_name = request.form.get('experiment_name')
+        
+        if not experiment_name:
+            flash('Please enter an experiment name', 'danger')
+            return redirect(url_for('experiment_query'))
+        
+        result = query_experiment(experiment_name)
+        
+        if result['status'] == 'error':
+            flash(result['message'], 'danger')
+            return redirect(url_for('experiment_query'))
+        
+        return render_template(
+            'experiment_results.html',
+            project=result['project'],
+            fields=result['fields'],
+            posts=result['posts'],
+            field_stats=result['field_stats']
+        )
+    
+    # GET request - show form to query experiment
+    conn = get_db_connection()
+    if conn:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT project_name FROM projects")
+        experiments = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        
+        return render_template('experiment_query.html', experiments=experiments)
+    
+    flash('Database connection failed', 'danger')
+    return redirect(url_for('index'))
+
+def query_experiment(experiment_name):
+    conn = get_db_connection()
+    if conn:
+        try:
+            cursor = conn.cursor(dictionary=True)
+            
+            # Get project details
+            cursor.execute("""
+                SELECT project_id, project_name, manager_first_name, manager_last_name, 
+                       institute_id, start_date, end_date
+                FROM projects 
+                WHERE project_name = %s
+            """, (experiment_name,))
+            
+            project = cursor.fetchone()
+            
+            if not project:
+                return {"status": "error", "message": "Experiment not found"}
+            
+            # Get fields for this project
+            cursor.execute("""
+                SELECT field_id, field_name
+                FROM project_fields
+                WHERE project_id = %s
+            """, (project['project_id'],))
+            
+            fields = cursor.fetchall()
+            
+            # Get posts associated with this project
+            cursor.execute("""
+                SELECT pp.post_id, p.post_text, sm.media_name, u.username, p.post_time
+                FROM project_posts pp
+                JOIN posts p ON pp.post_id = p.post_id
+                JOIN users u ON p.user_id = u.user_id
+                JOIN social_media sm ON p.media_id = sm.media_id
+                WHERE pp.project_id = %s
+            """, (project['project_id'],))
+            
+            posts = cursor.fetchall()
+            
+            # Get analysis results for each post
+            for post in posts:
+                cursor.execute("""
+                    SELECT pf.field_name, ar.result_value
+                    FROM analysis_results ar
+                    JOIN project_fields pf ON ar.field_id = pf.field_id
+                    WHERE ar.project_id = %s AND ar.post_id = %s
+                """, (project['project_id'], post['post_id']))
+                
+                results = cursor.fetchall()
+                post['results'] = {result['field_name']: result['result_value'] for result in results}
+            
+            # Calculate field statistics
+            field_stats = {}
+            for field in fields:
+                field_name = field['field_name']
+                field_stats[field_name] = {'total': len(posts), 'filled': 0}
+                
+                for post in posts:
+                    if field_name in post['results'] and post['results'][field_name]:
+                        field_stats[field_name]['filled'] += 1
+            
+            # Convert to percentages
+            for field_name, stats in field_stats.items():
+                if stats['total'] > 0:
+                    completion = (stats['filled'] / stats['total']) * 100
+                else:
+                    completion = 0
+                field_stats[field_name]['percentage'] = f"{completion:.1f}%"
+            
+            cursor.close()
+            conn.close()
+            
+            return {
+                "status": "success",
+                "project": project,
+                "fields": fields,
+                "posts": posts,
+                "field_stats": field_stats
+            }
+            
+        except Error as e:
+            print(f"Error querying experiment: {e}")
+            return {"status": "error", "message": str(e)}
+        finally:
+            if conn.is_connected():
+                conn.close()
+    
+    return {"status": "error", "message": "Database connection failed"}

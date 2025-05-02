@@ -1,0 +1,174 @@
+<!-- templates/experiment_result.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ project.project_name }} - Social Media Analysis System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        .card {
+            background-color: #1e1e1e;
+            border-color: #333;
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background-color: #252525;
+            border-color: #333;
+        }
+        .table {
+            color: #e0e0e0;
+        }
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        .btn-outline-secondary {
+            color: #e0e0e0;
+            border-color: #6c757d;
+        }
+        .progress {
+            background-color: #333;
+        }
+        
+        /* 추가: 다양한 너비의 진행 표시줄 클래스 */
+        .w-0 { width: 0%; }
+        .w-10 { width: 10%; }
+        .w-20 { width: 20%; }
+        .w-30 { width: 30%; }
+        .w-40 { width: 40%; }
+        .w-50 { width: 50%; }
+        .w-60 { width: 60%; }
+        .w-70 { width: 70%; }
+        .w-80 { width: 80%; }
+        .w-90 { width: 90%; }
+        .w-100 { width: 100%; }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <a href="{{ url_for('experiment_query') }}" class="btn btn-outline-secondary">Back to Query</a>
+            <h1>Experiment Details</h1>
+            <div></div> <!-- Empty div for flex spacing -->
+        </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <div class="card">
+            <div class="card-header">
+                <h3>{{ project.project_name }}</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Manager:</strong> {{ project.manager_first_name }} {{ project.manager_last_name }}</p>
+                        <p><strong>Institute ID:</strong> {{ project.institute_id }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Start Date:</strong> {{ project.start_date.strftime('%Y-%m-%d') }}</p>
+                        <p><strong>End Date:</strong> {{ project.end_date.strftime('%Y-%m-%d') }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h4>Field Completion Statistics</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for field in fields %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ field.field_name }}</h5>
+                                    <p>Completion: {{ field_stats[field.field_name].percentage }}</p>
+                                    
+                                    <!-- 백분율 값 추출 및 반올림 -->
+                                    {% set percentage_text = field_stats[field.field_name].percentage %}
+                                    {% set percentage_value = percentage_text|replace('%', '')|float %}
+                                    {% set rounded_percentage = ((percentage_value / 10)|round * 10)|int %}
+                                    
+                                    <!-- 진행 표시줄 - 인라인 스타일 대신 클래스 사용 -->
+                                    <div class="progress">
+                                        <div class="progress-bar w-{{ rounded_percentage }}" 
+                                             role="progressbar"
+                                             aria-valuenow="{{ percentage_value }}"
+                                             aria-valuemin="0"
+                                             aria-valuemax="100">
+                                            {{ percentage_text }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h4>Associated Posts ({{ posts|length }})</h4>
+            </div>
+            <div class="card-body">
+                {% if posts %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Social Media</th>
+                                    <th>Username</th>
+                                    <th>Post Time</th>
+                                    <th>Post Text</th>
+                                    <th>Analysis Results</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for post in posts %}
+                                    <tr>
+                                        <td>{{ post.media_name }}</td>
+                                        <td>{{ post.username }}</td>
+                                        <td>{{ post.post_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td>
+                                            <div style="max-height: 100px; overflow-y: auto;">
+                                                {{ post.post_text|truncate(200) }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if post.results %}
+                                                <ul class="list-unstyled mb-0">
+                                                    {% for field_name, result in post.results.items() %}
+                                                        <li><strong>{{ field_name }}:</strong> {{ result or 'N/A' }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            {% else %}
+                                                <span class="text-muted">No results yet</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">No posts associated with this experiment yet.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

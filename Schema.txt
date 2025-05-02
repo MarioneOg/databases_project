@@ -1,0 +1,95 @@
+SocialMedia{
+    name PRIMARY KEY
+}
+
+User(
+    username,
+    social_media,
+    first_name,
+    last_name,
+    country_of_birth,
+    country_of_residence,
+    age,
+    gender,
+    is_verified,
+    PRIMARY KEY (username, social_media),
+    FOREIGN KEY (social_media) REFERENCES SocialMedia(name)
+)
+
+Post(
+    post_username,
+    post_social_media,
+    post_time,
+    text,
+    likes,
+    dislikes,
+    location_city,
+    location_state,
+    location_country,
+    has_multimedia,
+    PRIMARY KEY (post_username, post_social_media, post_time),
+    FOREIGN KEY (post_username, post_social_media) REFERENCES User(username, social_media)
+)
+Constraints: likes >= 0, dislikes >= 0
+
+Repost(
+    original_post_username,
+    original_social_media,
+    original_post_time,
+    repost_username,
+    repost_social_media,
+    repost_time,
+    repost_location_city,
+    repost_location_state,
+    repost_location_country,
+    repost_likes,
+    repost_dislikes,
+    repost_has_multimedia,
+    PRIMARY KEY (repost_username, repost_social_media, repost_time),
+    FOREIGN KEY (original_post_username, original_social_media, original_post_time) REFERENCES Post(post_username, post_social_media, post_time),
+    FOREIGN KEY (repost_username, repost_social_media) REFERENCES User(username, social_media)
+)
+Constraints: repost_likes >= 0, repost_dislikes >= 0, repost_time > original_post_time
+
+Project(
+    name PRIMARY KEY,
+    manager_firstname,
+    manager_lastname,
+    institute_name,
+    start_date,
+    end_date
+)
+Constraint: end_date >= start_date
+
+Institute(
+    name PRIMARY KEY
+)
+
+Field(
+    field_name,
+    project_name,
+    PRIMARY KEY (project_name, field_name),
+    FOREIGN KEY (project_name) REFERENCES Project(name)
+)
+
+Project_Post(
+    project_name,
+    post_username,
+    post_social_media,
+    post_time,
+    PRIMARY KEY (project_name, post_username, post_social_media, post_time),
+    FOREIGN KEY (project_name) REFERENCES Project(name),
+    FOREIGN KEY (post_username, post_social_media, post_time) REFERENCES Post(post_username, post_social_media, post_time)
+)
+
+Analysis_Result(
+    project_name,
+    post_username,
+    post_social_media,
+    post_time,
+    field_name,
+    analysis,
+    PRIMARY KEY (project_name, post_username, post_social_media, post_time, field_name),
+    FOREIGN KEY (project_name, post_username, post_social_media, post_time) REFERENCES Project_Post(project_name, post_username, post_social_media, post_time),
+    FOREIGN KEY (project_name, field_name) REFERENCES Field(project_name, field_name)
+)
