@@ -37,7 +37,7 @@ document.getElementById("submit-post-btn").addEventListener("click", async () =>
         alert("End date cannot be earlier than the start date.");
         return;
     }
-    
+
     const username = document.getElementById("username").value.trim();
     const firstName = document.getElementById("first-name").value.trim();
     const lastName = document.getElementById("last-name").value.trim();
@@ -93,17 +93,5 @@ document.getElementById("submit-exp-btn").addEventListener("click", async () => 
     }
 });
 
-localStorage.setItem("lastQuery", JSON.stringify({
-    queryType: "post",
-    results: data   
-}));
-  
-localStorage.setItem("lastQuery", JSON.stringify({
-    queryType: "experiment",
-    experimentName,   
-    // Assuming these things are called "fields" and "posts" in the json, these should be lists
-    fields: data.fields,
-    posts: data.posts     
-}));
   
   
