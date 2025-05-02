@@ -49,11 +49,11 @@ def query():
     return render_template('query.html')
 
 @app.route('/experiment_query')
-def results():
+def expirement_query():
     return render_template('experiment_query.html')
 
 @app.route('/experiment_result')
-def results():
+def experiment_result():
     return render_template('experiment_result.html')
 
 @app.route('/results')
