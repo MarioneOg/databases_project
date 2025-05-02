@@ -18,13 +18,15 @@
             <button class="entry-button" id="analysis-btn">Add Analysis Result</button>
         </div>
 
-        <div id="project-form" class="form-section hidden">
+        <form id="project-form" class="form-section hidden" method="POST" action="{{ url_for('add_project') }}">
             <input type="text" id="project-name" placeholder="Project Name" class="form-input" />
             <input type="text" id="manager-first-name" placeholder="Project Manager First Name" class="form-input" />
             <input type="text" id="manager-last-name" placeholder="Project Manager Last Name" class="form-input" />
             <input type="text" id="institute-name" placeholder="Institute Name" class="form-input" />
-            <input type="text" id="start-date" placeholder="Start Date (mm/dd/yyyy)" class="form-input" />
-            <input type="text" id="end-date" placeholder="End Date (mm/dd/yyyy)" class="form-input" />
+            <label for="start-date">Start Date:</label>
+            <input type="date" id="start-date" class="form-input" />
+            <label for="end-date">End Date:</label>
+            <input type="date" id="end-date" class="form-input" />
             <button id="submit-project" class="submit-btn">Add</button>
             <!-- <label class="form-label">Start Date</label> -->
             <!-- <div class="date-row">
@@ -39,9 +41,9 @@
                 <input type="text" placeholder="YYYY" class="date-input" maxlength="4">
             </div> -->
 
-        </div>
+        </form>
 
-        <div id="post-form" class="form-section hidden">
+        <form id="post-form" class="form-section hidden" method="POST" action="{{ url_for('add_post') }}">
             <h3 class="form-subheader">Project</h3>
             <input type="text" id="project-name" placeholder="Project Name" class="form-input" />
           
@@ -79,9 +81,9 @@
 
             <button id="submit-post" class="submit-btn">Add</button>
 
-        </div>
+        </form>
 
-        <div id="analysis-form" class="form-section hidden">
+        <form id="analysis-form" class="form-section hidden" method="POST" action="{{ url_for('add_analysis') }}">
             <input type="text" id="project-name" placeholder="Project Name" class="form-input" />
             <input type="text" id="username" placeholder="Post Username" class="form-input" />
             <input type="text" id="social-media" placeholder="Post Social Media" class="form-input" />
@@ -89,7 +91,18 @@
             <input type="text" id="field-name" placeholder="Field Name" class="form-input" />
             <input type="text" id="analysis" placeholder="Analysis / Result" class="form-input" />
             <button id="submit-analysis" class="submit-btn">Add</button>
-        </div>
+        </form>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                    {% for category, message in messages %}
+                        <li class="flash-{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
           
           
           
