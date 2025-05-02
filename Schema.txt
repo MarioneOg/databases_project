@@ -29,8 +29,9 @@ Post(
     has_multimedia,
     PRIMARY KEY (post_username, post_social_media, post_time),
     FOREIGN KEY (post_username, post_social_media) REFERENCES User(username, social_media)
+    CHECK (likes >= 0),
+    CHECK (dislikes >= 0)
 )
-Constraints: likes >= 0, dislikes >= 0
 
 Repost(
     original_post_username,
@@ -48,8 +49,11 @@ Repost(
     PRIMARY KEY (repost_username, repost_social_media, repost_time),
     FOREIGN KEY (original_post_username, original_social_media, original_post_time) REFERENCES Post(post_username, post_social_media, post_time),
     FOREIGN KEY (repost_username, repost_social_media) REFERENCES User(username, social_media)
+    CHECK (repost_likes >= 0),
+    CHECK (repost_dislikes >= 0),
+    CHECK (repost_time > original_post_time)
 )
-Constraints: repost_likes >= 0, repost_dislikes >= 0, repost_time > original_post_time
+
 
 Project(
     name PRIMARY KEY,
@@ -58,8 +62,8 @@ Project(
     institute_name,
     start_date,
     end_date
+    CHECK (end_date >= start_date)
 )
-Constraint: end_date >= start_date
 
 Institute(
     name PRIMARY KEY
