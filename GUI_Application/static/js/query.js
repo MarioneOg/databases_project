@@ -52,8 +52,7 @@ document.getElementById("submit-post-btn").addEventListener("click", async (even
     });
   
     try {
-        // This line may need to be changed???
-        const response = await fetch(`http://localhost:5000/search-posts?${params.toString()}`);
+        const response = await fetch(`/search-posts?${params.toString()}`);
         const data = await response.json();
   
         localStorage.setItem("lastQuery", JSON.stringify({
