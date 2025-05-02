@@ -42,6 +42,12 @@ document.getElementById("submit-post-btn").addEventListener("click", async (even
     const firstName = document.getElementById("first-name").value.trim();
     const lastName = document.getElementById("last-name").value.trim();
   
+    if (!socialMedia && !startDate && !endDate && !username && !firstName && !lastName) {
+        event.preventDefault();  // Prevent form submission
+        alert("Please fill out at least one field.");
+        return;
+    }
+    
     const params = new URLSearchParams({
         socialMedia,
         startDate,
