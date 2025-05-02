@@ -48,6 +48,14 @@ def entry():
 def query():
     return render_template('query.html')
 
+@app.route('/experiment_query')
+def results():
+    return render_template('experiment_query.html')
+
+@app.route('/experiment_result')
+def results():
+    return render_template('experiment_result.html')
+
 @app.route('/results')
 def results():
     return render_template('results.html')
