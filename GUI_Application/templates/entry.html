@@ -19,7 +19,7 @@
         </div>
 
         <form id="project-form" class="form-section hidden" method="POST" action="{{ url_for('add_project') }}">
-            <input type="text" id="project-name" name="project_name" placeholder="Project Name" class="form-input" />
+            <input type="text" id="project-name" name="project_name" placeholder="Project Name" class="form-input" required/>
             <input type="text" id="manager-first-name" name="manager_first_name" placeholder="Project Manager First Name" class="form-input" />
             <input type="text" id="manager-last-name" name="manager_last_name" placeholder="Project Manager Last Name" class="form-input" />
             <input type="text" id="institute-name" name="institute_name" placeholder="Institute Name" class="form-input" />

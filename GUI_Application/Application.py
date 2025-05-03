@@ -6,34 +6,62 @@ import datetime
 app = Flask(__name__)
 app.secret_key = 'social_media_analysis_key'
 
-# Database Configuration - read from config file
-def get_db_config():
-    try:
-        with open('db_config.txt', 'r') as file:
-            lines = file.readlines()
-            config = {}
-            for line in lines:
-                key, value = line.strip().split('=')
-                config[key] = value
-            return config
-    except Exception as e:
-        print(f"Error reading config file: {e}")
-        # Default config if file cannot be read
-        return {
-            'host': 'localhost',
-            'user': 'root',
-            'password': 'password',
-            'database': 'social_media_analysis'
-        }
+# # Database Configuration
+# @app.route('/connect-db', methods=['POST'])
+# def get_db_config():
+#     # import mysql.connector
+
+#     try:
+#         # Establish connection
+#         conn = mysql.connector.connect(
+#             host="localhost",
+#             user="myuser",
+#             password="mypassword",
+#             database="social_media_analysis"
+#         )   
+#         if conn.is_connected():
+#             print("Connected to the database successfully!")
+#         else:
+#             print("Connection failed.")
+    
+#         # Close the connection
+#         conn.close()
+
+#     except mysql.connector.Error as err:
+#         print(f"Error: {err}")
+
 
 # Function to get database connection
 def get_db_connection():
     try:
-        conn = mysql.connector.connect(**get_db_config())
+        conn = mysql.connector.connect(
+            host="localhost",
+            user="myuser",
+            password="mypassword",
+            database="social_media_analysis"
+        )
         return conn
-    except Error as e:
+    except mysql.connector.Error as e:
         print(f"Error connecting to MySQL: {e}")
         return None
+    
+@app.route('/connect-db', methods=['GET', 'POST'])
+def connect_db():
+    if request.method == 'POST':
+        try:
+            conn = get_db_connection()
+            if conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT 1")
+                cursor.close()
+                conn.close()
+                flash("Database connection successful", "success")
+            else:
+                flash("Database connection failed", "danger")
+        except Exception as e:
+            flash(f"Error connecting to database: {e}", "danger")
+    
+        return redirect(url_for('index'))
 
 # Home page
 @app.route('/')
@@ -131,68 +159,71 @@ def list_projects():
 def add_project():
     if request.method == 'POST':
         project_name = request.form['project_name']
-        manager_first_name = request.form['manager_first_name']
-        manager_last_name = request.form['manager_last_name']
-        institute_name = request.form['institute_name']
-        start_date = request.form['start_date']
-        end_date = request.form['end_date']
+        manager_first_name = request.form['manager_first_name'] or None
+        manager_last_name = request.form['manager_last_name'] or None
+        institute_name = request.form['institute_name'] or None
+        start_date = request.form['start_date'] or None
+        end_date = request.form['end_date'] or None
         
         conn = get_db_connection()
         if conn:
             cursor = conn.cursor()
             
+            institute = None
             # Check if institute exists
-            cursor.execute("SELECT institute_id FROM institutes WHERE institute_name = %s", (institute_name,))
-            institute = cursor.fetchone()
+            if institute_name:
+                cursor.execute("SELECT name FROM Institute WHERE name = %s", (institute_name,))
+                institute = cursor.fetchone()
             
-            if not institute:
-                # Create institute
-                cursor.execute("INSERT INTO institutes (institute_name) VALUES (%s)", (institute_name,))
-                institute_id = cursor.lastrowid
-            else:
-                institute_id = institute[0]
+                if not institute:
+                    # Create institute
+                    cursor.execute("INSERT INTO Institute (name) VALUES (%s)", (institute_name,))
+                    # institute_id = cursor.lastrowid
+            # else:
+            #     institute_id = institute[0]
             
             # Create project
             cursor.execute("""
-                INSERT INTO projects (project_name, manager_first_name, manager_last_name, 
-                                     institute_id, start_date, end_date)
+                INSERT INTO Project (name, manager_firstname, manager_lastname, 
+                                     institute_name, start_date, end_date)
                 VALUES (%s, %s, %s, %s, %s, %s)
             """, (project_name, manager_first_name, manager_last_name, 
-                 institute_id, start_date, end_date))
+                 institute_name, start_date, end_date))
             
             conn.commit()
-            project_id = cursor.lastrowid
+            # project_id = cursor.lastrowid
             
             # Handle project fields
-            field_names = request.form.getlist('field_name')
-            for field_name in field_names:
-                if field_name.strip():
-                    cursor.execute("""
-                        INSERT INTO project_fields (project_id, field_name)
-                        VALUES (%s, %s)
-                    """, (project_id, field_name))
+            # field_names = request.form.getlist('field_name')
+            # for field_name in field_names:
+            #     if field_name.strip():
+            #         cursor.execute("""
+            #             INSERT INTO project_fields (project_id, field_name)
+            #             VALUES (%s, %s)
+            #         """, (project_id, field_name))
             
-            conn.commit()
+            # conn.commit()
             cursor.close()
             conn.close()
             
             flash("Project added successfully", "success")
-            return redirect(url_for('list_projects'))
+            return redirect(url_for('entry'))
         
         flash("Database connection error", "danger")
     
-    # GET request
-    conn = get_db_connection()
-    if conn:
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT institute_name FROM institutes")
-        institutes = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        return render_template('add_project.html', institutes=institutes)
+    # # GET request
+    # else:
+    #     conn = get_db_connection()
+    #     if conn:
+    #         cursor = conn.cursor(dictionary=True)
+    #         cursor.execute("SELECT name FROM Institute")
+    #         institutes = cursor.fetchall()
+    #         cursor.close()
+    #         conn.close()
+    #         # return render_template('entry.html', institutes=institutes)
     
-    flash("Database connection error", "danger")
-    return redirect(url_for('index'))
+    #     flash("Database connection error", "danger")
+    #     return redirect(url_for('index'))
 
 @app.route('/projects/<int:project_id>', methods=['GET'])
 def view_project(project_id):
