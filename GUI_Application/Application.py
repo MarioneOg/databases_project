@@ -56,6 +56,11 @@ def expirement_query():
 def experiment_result():
     return render_template('experiment_result.html')
 
+@app.route('/post-results')
+def post_results():
+    query = request.form.to_dict() 
+    return render_template('post_results.html', query=query)
+
 @app.route('/results')
 def results():
     return render_template('results.html')

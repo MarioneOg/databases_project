@@ -47,7 +47,7 @@ document.getElementById("submit-post-btn").addEventListener("click", async (even
         alert("Please fill out at least one field.");
         return;
     }
-    
+
     const params = new URLSearchParams({
         socialMedia,
         startDate,
@@ -66,7 +66,7 @@ document.getElementById("submit-post-btn").addEventListener("click", async (even
             results: data
         }));
   
-        window.location.href = "/results";
+        window.location.href = "/post-results";
     } catch (err) {
         console.error("Failed to fetch results:", err);
         alert("An error occurred while querying the backend.");
