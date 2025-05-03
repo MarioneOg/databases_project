@@ -19,7 +19,7 @@
         </div>
 
         <form id="project-form" class="form-section hidden" method="POST" action="{{ url_for('add_project') }}">
-            <input type="text" id="project-name" placeholder="Project Name" class="form-input" />
+            <input type="text" id="project-name" placeholder="* Project Name" class="form-input" />
             <input type="text" id="manager-first-name" placeholder="Project Manager First Name" class="form-input" />
             <input type="text" id="manager-last-name" placeholder="Project Manager Last Name" class="form-input" />
             <input type="text" id="institute-name" placeholder="Institute Name" class="form-input" />
@@ -45,11 +45,11 @@
 
         <form id="post-form" class="form-section hidden" method="POST" action="{{ url_for('add_post') }}">
             <h3 class="form-subheader">Project</h3>
-            <input type="text" id="project-name" placeholder="Project Name" class="form-input" />
+            <input type="text" id="project-name" placeholder="* Project Name" class="form-input" />
           
             <h3 class="form-subheader">User Info</h3>
-            <input type="text" id="username" placeholder="Username" class="form-input" />
-            <input type="text" id="social-media" placeholder="Social Media" class="form-input" />
+            <input type="text" id="username" placeholder="* Username" class="form-input" />
+            <input type="text" id="social-media" placeholder="* Social Media" class="form-input" />
             <input type="text" id="first-name" placeholder="First Name" class="form-input" />
             <input type="text" id="last-name" placeholder="Last Name" class="form-input" />
             <input type="text" id="country-birth" placeholder="Country of Birth" class="form-input" />
@@ -59,7 +59,7 @@
             <input type="text" id="verified" placeholder="Verified (Yes/No)" class="form-input" />
           
             <h3 class="form-subheader">Original Post</h3>
-            <input type="text" id="post-time" placeholder="Time of Post" class="form-input" />
+            <input type="text" id="post-time" placeholder="* Time of Post" class="form-input" />
             <input type="text" id="text" placeholder="Text of Post" class="form-input" />
             <input type="text" id="likes" placeholder="Likes" class="form-input" />
             <input type="text" id="dislikes" placeholder="Dislikes" class="form-input" />
@@ -71,7 +71,7 @@
             <h3 class="form-subheader">Repost</h3>
             <input type="text" id="repost-username" placeholder="Reposter's Username" class="form-input" />
             <input type="text" id="repost-social-media" placeholder="Reposter's Social Media" class="form-input" />
-            <input type="text" id="repost-time" placeholder="Repost Time" class="form-input" />
+            <input type="text" id="post-time" placeholder="Time of Repost" class="form-input" />
             <input type="text" id="repost-city" placeholder="Repost City" class="form-input" />
             <input type="text" id="repost-state" placeholder="Repost State" class="form-input" />
             <input type="text" id="repost-country" placeholder="Repost Country" class="form-input" />
@@ -84,11 +84,11 @@
         </form>
 
         <form id="analysis-form" class="form-section hidden" method="POST" action="{{ url_for('add_analysis') }}">
-            <input type="text" id="project-name" placeholder="Project Name" class="form-input" />
-            <input type="text" id="username" placeholder="Post Username" class="form-input" />
-            <input type="text" id="social-media" placeholder="Post Social Media" class="form-input" />
-            <input type="text" id="post-time" placeholder="Time of Post" class="form-input" />
-            <input type="text" id="field-name" placeholder="Field Name" class="form-input" />
+            <input type="text" id="project-name" placeholder="* Project Name" class="form-input" />
+            <input type="text" id="username" placeholder="* Post Username" class="form-input" />
+            <input type="text" id="social-media" placeholder="* Post Social Media" class="form-input" />
+            <input type="text" id="post-time" placeholder="* Time of Post" class="form-input" />
+            <input type="text" id="field-name" placeholder="* Field Name" class="form-input" />
             <input type="text" id="analysis" placeholder="Analysis / Result" class="form-input" />
             <button id="submit-analysis" class="submit-btn">Add</button>
         </form>
