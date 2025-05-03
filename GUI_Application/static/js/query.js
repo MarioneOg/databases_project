@@ -79,8 +79,8 @@ document.getElementById("submit-exp-btn").addEventListener("click", async (event
     const experimentName = document.getElementById("experiment-name").value.trim();
   
     try {
-        // This line might need to be changed???
-        const response = await fetch(`http://localhost:5000/search-experiment?name=${encodeURIComponent(experimentName)}`);
+        
+        const response = await fetch(`/search-experiment?${params.toString()}`);
         const data = await response.json();
   
         localStorage.setItem("lastQuery", JSON.stringify({

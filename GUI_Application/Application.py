@@ -58,8 +58,9 @@ def experiment_result():
 
 @app.route('/post-results')
 def post_results():
-    query = request.form.to_dict() 
+    query = request.form.to_dict()  
     return render_template('post_results.html', query=query)
+
 
 @app.route('/results')
 def results():
