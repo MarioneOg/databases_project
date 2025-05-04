@@ -584,7 +584,39 @@ def add_user(conn, username, social_media, first_name, last_name, country_birth,
         """, (username, social_media, first_name, last_name, country_birth,
               country_residence, age, gender, verified))
         conn.commit()
-    
+    else:
+        update_fields = []
+        update_values = []
+
+        if first_name:
+            update_fields.append("first_name = %s")
+            update_values.append(first_name)
+        if last_name:
+            update_fields.append("last_name = %s")
+            update_values.append(last_name)
+        if country_birth:
+            update_fields.append("country_of_birth = %s")
+            update_values.append(country_birth)
+        if country_residence:
+            update_fields.append("country_of_residence = %s")
+            update_values.append(country_residence)
+        if age:
+            update_fields.append("age = %s")
+            update_values.append(age)
+        if verified is not None:
+            update_fields.append("is_verified = %s")
+            update_values.append(verified)
+
+        if update_fields:
+            update_query = f"""
+                UPDATE User
+                SET {', '.join(update_fields)}
+                WHERE username = %s AND social_media = %s
+            """
+            update_values.extend([username, social_media])
+            cursor.execute(update_query, tuple(update_values))
+        
+    conn.commit()
     cursor.close()
 
 def add_post(conn, username, social_media, post_time, text, likes, dislikes, city, state, country, multimedia):
