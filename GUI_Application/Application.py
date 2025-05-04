@@ -113,28 +113,28 @@ def list_social_media():
     flash("Database connection error", "danger")
     return redirect(url_for('index'))
 
-@app.route('/social_media/add', methods=['GET', 'POST'])
-def add_social_media():
-    if request.method == 'POST':
-        media_name = request.form['media_name']
+# @app.route('/social_media/add', methods=['GET', 'POST'])
+# def add_social_media():
+#     if request.method == 'POST':
+#         media_name = request.form['media_name']
         
-        conn = get_db_connection()
-        if conn:
-            cursor = conn.cursor()
-            try:
-                cursor.execute("INSERT INTO social_media (media_name) VALUES (%s)", (media_name,))
-                conn.commit()
-                flash(f"Social media '{media_name}' added successfully", "success")
-            except Error as e:
-                flash(f"Error adding social media: {e}", "danger")
+#         conn = get_db_connection()
+#         if conn:
+#             cursor = conn.cursor()
+#             try:
+#                 cursor.execute("INSERT INTO social_media (media_name) VALUES (%s)", (media_name,))
+#                 conn.commit()
+#                 flash(f"Social media '{media_name}' added successfully", "success")
+#             except Error as e:
+#                 flash(f"Error adding social media: {e}", "danger")
             
-            cursor.close()
-            conn.close()
-            return redirect(url_for('list_social_media'))
+#             cursor.close()
+#             conn.close()
+#             return redirect(url_for('list_social_media'))
         
-        flash("Database connection error", "danger")
+#         flash("Database connection error", "danger")
     
-    return render_template('add_social_media.html')
+#     return render_template('add_social_media.html')
 
 # Project Management
 @app.route('/projects', methods=['GET'])
@@ -156,7 +156,7 @@ def list_projects():
     return redirect(url_for('index'))
 
 @app.route('/projects/add', methods=['GET', 'POST'])
-def add_project():
+def add_project_form():
     if request.method == 'POST':
         project_name = request.form['project_name']
         manager_first_name = request.form['manager_first_name'] or None
@@ -317,68 +317,68 @@ def list_users():
     flash("Database connection error", "danger")
     return redirect(url_for('index'))
 
-@app.route('/users/add', methods=['GET', 'POST'])
-def add_user():
-    if request.method == 'POST':
-        media_name = request.form['media_name']
-        username = request.form['username']
-        first_name = request.form['first_name'] or None
-        last_name = request.form['last_name'] or None
-        country_of_birth = request.form['country_of_birth'] or None
-        country_of_residence = request.form['country_of_residence'] or None
-        age = request.form['age'] or None
-        gender = request.form['gender'] or None
-        is_verified = 'is_verified' in request.form
+# @app.route('/users/add', methods=['GET', 'POST'])
+# def add_user():
+#     if request.method == 'POST':
+#         media_name = request.form['media_name']
+#         username = request.form['username']
+#         first_name = request.form['first_name'] or None
+#         last_name = request.form['last_name'] or None
+#         country_of_birth = request.form['country_of_birth'] or None
+#         country_of_residence = request.form['country_of_residence'] or None
+#         age = request.form['age'] or None
+#         gender = request.form['gender'] or None
+#         is_verified = 'is_verified' in request.form
         
-        conn = get_db_connection()
-        if conn:
-            cursor = conn.cursor()
+#         conn = get_db_connection()
+#         if conn:
+#             cursor = conn.cursor()
             
-            # Check if social media exists
-            cursor.execute("SELECT media_id FROM social_media WHERE media_name = %s", (media_name,))
-            media = cursor.fetchone()
+#             # Check if social media exists
+#             cursor.execute("SELECT media_id FROM social_media WHERE media_name = %s", (media_name,))
+#             media = cursor.fetchone()
             
-            if not media:
-                # Create social media
-                cursor.execute("INSERT INTO social_media (media_name) VALUES (%s)", (media_name,))
-                media_id = cursor.lastrowid
-            else:
-                media_id = media[0]
+#             if not media:
+#                 # Create social media
+#                 cursor.execute("INSERT INTO social_media (media_name) VALUES (%s)", (media_name,))
+#                 media_id = cursor.lastrowid
+#             else:
+#                 media_id = media[0]
             
-            # Create user
-            try:
-                cursor.execute("""
-                    INSERT INTO users (media_id, username, first_name, last_name, 
-                                     country_of_birth, country_of_residence, age, 
-                                     gender, is_verified)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """, (media_id, username, first_name, last_name, 
-                     country_of_birth, country_of_residence, age, 
-                     gender, is_verified))
+#             # Create user
+#             try:
+#                 cursor.execute("""
+#                     INSERT INTO users (media_id, username, first_name, last_name, 
+#                                      country_of_birth, country_of_residence, age, 
+#                                      gender, is_verified)
+#                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+#                 """, (media_id, username, first_name, last_name, 
+#                      country_of_birth, country_of_residence, age, 
+#                      gender, is_verified))
                 
-                conn.commit()
-                flash("User added successfully", "success")
-            except Error as e:
-                flash(f"Error adding user: {e}", "danger")
+#                 conn.commit()
+#                 flash("User added successfully", "success")
+#             except Error as e:
+#                 flash(f"Error adding user: {e}", "danger")
             
-            cursor.close()
-            conn.close()
-            return redirect(url_for('list_users'))
+#             cursor.close()
+#             conn.close()
+#             return redirect(url_for('list_users'))
         
-        flash("Database connection error", "danger")
+#         flash("Database connection error", "danger")
     
-    # GET request
-    conn = get_db_connection()
-    if conn:
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT media_name FROM social_media")
-        social_media = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        return render_template('add_user.html', social_media=social_media)
+#     # GET request
+#     conn = get_db_connection()
+#     if conn:
+#         cursor = conn.cursor(dictionary=True)
+#         cursor.execute("SELECT media_name FROM social_media")
+#         social_media = cursor.fetchall()
+#         cursor.close()
+#         conn.close()
+#         return render_template('add_user.html', social_media=social_media)
     
-    flash("Database connection error", "danger")
-    return redirect(url_for('index'))
+#     flash("Database connection error", "danger")
+#     return redirect(url_for('index'))
 
 # Post Management
 @app.route('/posts', methods=['GET'])
@@ -407,106 +407,345 @@ def list_posts():
     flash("Database connection error", "danger")
     return redirect(url_for('index'))
 
+def add_social_media(conn, social_media):
+    cursor = conn.cursor()
+
+    # Check if the social media platform already exists
+    cursor.execute("SELECT name FROM Social_Media WHERE name = %s", (social_media,))
+    result = cursor.fetchone()
+
+    if not result:
+        # Insert it if it's not already in the table
+        cursor.execute("INSERT INTO Social_Media (name) VALUES (%s)", (social_media,))
+        conn.commit()
+
+    cursor.close()
+
+# Helper functions for Add Post Data Entry
+def add_user(conn, username, social_media, first_name, last_name, country_birth, country_residence, age, gender, verified):
+    cursor = conn.cursor()
+
+    # Check if user exists
+    cursor.execute("""
+        SELECT * FROM User
+        WHERE username = %s AND social_media = %s
+    """, (username, social_media))
+    user = cursor.fetchone()
+
+    if not user:
+        # Insert new user
+        cursor.execute("""
+            INSERT INTO User (username, social_media, first_name, last_name,
+                               country_of_birth, country_of_residence, age, gender, is_verified)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (username, social_media, first_name, last_name, country_birth,
+              country_residence, age, gender, verified))
+        conn.commit()
+    
+    cursor.close()
+
+def add_post(conn, username, social_media, post_time, text, likes, dislikes, city, state, country, multimedia):
+    cursor = conn.cursor()
+
+    # Check if original post exists
+    cursor.execute("""
+        SELECT * FROM Post
+        WHERE post_username = %s AND post_social_media = %s AND post_time = %s
+    """, (username, social_media, post_time))
+    check_post = cursor.fetchone()
+
+    if not check_post:
+        cursor.execute("""
+            INSERT INTO Post (post_username, post_social_media, post_time, text, likes, dislikes, location_city, location_state, location_country, has_multimedia)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (username, social_media, post_time, text, likes, dislikes, city, state, country, multimedia))
+        conn.commit()
+
+    cursor.close()
+
+def add_repost(conn,
+               repost_username, repost_social_media, repost_time,
+               repost_city, repost_state, repost_country,
+               repost_likes, repost_dislikes, repost_multimedia,
+               original_username, original_social_media, original_post_time):
+    cursor = conn.cursor()
+
+    # Check if repost social media exists
+    cursor.execute("SELECT name FROM Social_Media WHERE name = %s", (repost_social_media,))
+    check_media = cursor.fetchone()
+
+    if not check_media:
+        cursor.execute("INSERT INTO Social_Media (name) VALUES (%s)", (repost_social_media,))
+        conn.commit()
+
+    print("Checking user")
+    # Check if repost user exists
+    cursor.execute("""
+        SELECT * FROM User
+        WHERE username = %s AND social_media = %s
+    """, (repost_username, repost_social_media))
+    check_user = cursor.fetchone()
+
+    print("Checked the finding user")
+
+    if not check_user:
+        cursor.execute("""
+            INSERT INTO User (username, social_media, first_name, last_name, country_of_birth, country_of_residence, age, gender, is_verified)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (repost_username, repost_social_media, None, None, None, None, None, None, None))
+        conn.commit()
+    print("Finished user")
+
+    print("Checking original post")
+    # Check if original post exists
+    cursor.execute("""
+        SELECT * FROM Post
+        WHERE post_username = %s AND post_social_media = %s AND post_time = %s
+    """, (original_username, original_social_media, original_post_time))
+    check_original_post = cursor.fetchone()
+
+    if not check_original_post:
+        flash(f"Original post not found", "danger")
+        cursor.close()
+        conn.close()
+        return redirect(url_for('entry'))
+    print("Finished original post")
+
+    print("Checking repost exists")
+    # Check if repost already exists
+    cursor.execute("""
+        SELECT * FROM Repost
+        WHERE repost_username = %s AND repost_social_media = %s AND repost_time = %s
+    """, (repost_username, repost_social_media, repost_time))
+    check_repost = cursor.fetchone()
+
+    if check_repost:
+        flash(f"Repost already exists", "danger")
+        cursor.close()
+        conn.close()
+        return redirect(url_for('entry'))
+    print("Finished repost exists")
+
+    # Insert repost
+    print("Inserting now")
+    cursor.execute("""
+        INSERT INTO Repost (
+            original_post_username, original_social_media, original_post_time,
+            repost_username, repost_social_media, repost_time,
+            repost_location_city, repost_location_state, repost_location_country,
+            repost_likes, repost_dislikes, repost_has_multimedia
+        )
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    """, (
+        original_username, original_social_media, original_post_time,
+        repost_username, repost_social_media, repost_time,
+        repost_city, repost_state, repost_country,
+        repost_likes, repost_dislikes, repost_multimedia
+    ))
+
+    conn.commit()
+    print("Finished insert")
+    cursor.close()
+
+
+def add_project_post(conn, project_name, username, social_media, post_time):
+    cursor = conn.cursor()
+
+    # Check if this link already exists
+    cursor.execute("""
+        SELECT * FROM Project_Post
+        WHERE project_name = %s AND post_username = %s AND post_social_media = %s AND post_time = %s
+    """, (project_name, username, social_media, post_time))
+    check_project_post = cursor.fetchone()
+
+    if check_project_post:
+        flash(f"Project Post already exists", "danger")
+        cursor.close()
+        conn.close()
+        return redirect(url_for('entry'))
+    
+    cursor.execute("""
+        INSERT INTO Project_Post (project_name, post_username, post_social_media, post_time)
+        VALUES (%s, %s, %s, %s)
+    """, (project_name, username, social_media, post_time))
+
+    conn.commit()
+    cursor.close()
+
+
+
 @app.route('/posts/add', methods=['GET', 'POST'])
-def add_post():
+def add_post_form():
     if request.method == 'POST':
-        media_name = request.form['media_name']
+        project_name = request.form['project_name']
+
         username = request.form['username']
-        post_text = request.form['post_text']
+        social_media = request.form['social_media']
+        first_name = request.form['first_name'] or None
+        last_name = request.form['last_name'] or None
+        country_birth = request.form['country_birth'] or None
+        country_residence = request.form['country_residence'] or None
+        age = request.form['age'] or None
+        gender = request.form['gender'] or None
+        verified = request.form['verified'] or None
+
         post_time = request.form['post_time']
+        text = request.form['text'] or None
+        likes = request.form['likes'] or None
+        dislikes = request.form['dislikes'] or None
         city = request.form['city'] or None
         state = request.form['state'] or None
         country = request.form['country'] or None
-        likes = request.form['likes'] or 0
-        dislikes = request.form['dislikes'] or 0
-        has_multimedia = 'has_multimedia' in request.form
-        
+        multimedia = request.form['multimedia'] or None
+
+        repost_username = request.form['repost_username'] or None
+        repost_social_media = request.form['repost_social_media'] or None
+        repost_time = request.form['repost_time'] or None
+        repost_city = request.form['repost_city'] or None
+        repost_state = request.form['repost_state'] or None
+        repost_country = request.form['repost_country'] or None
+        repost_likes = request.form['repost_likes'] or None
+        repost_dislikes = request.form['repost_dislikes'] or None
+        repost_multimedia = request.form['repost_multimedia'] or None
+
         conn = get_db_connection()
         if conn:
             cursor = conn.cursor()
             
-            # Get user ID
-            cursor.execute("""
-                SELECT u.user_id, sm.media_id FROM users u
-                JOIN social_media sm ON u.media_id = sm.media_id
-                WHERE sm.media_name = %s AND u.username = %s
-            """, (media_name, username))
-            user_info = cursor.fetchone()
             
-            if not user_info:
-                flash(f"User {username} on {media_name} not found", "danger")
+            # Check if project exists
+            cursor.execute("SELECT name FROM Project WHERE name = %s", (project_name,))
+            check_project = cursor.fetchone()
+            
+            if not check_project:
+                flash(f"Project {project_name} not found", "danger")
                 cursor.close()
                 conn.close()
-                return redirect(url_for('add_post'))
+                return redirect(url_for('entry'))
+            # else:
+            #     institute_id = institute[0]
             
-            user_id, media_id = user_info
+            # Add to tables
+            add_social_media(conn, social_media)
+            add_user(conn, username, social_media, first_name, last_name,
+                     country_birth, country_residence, age, gender, verified)
+            add_post(conn, username, social_media, post_time, text, likes, 
+                     dislikes, city, state, country, multimedia)
+            if repost_username and repost_social_media and repost_time:
+                add_repost(conn, repost_username, repost_social_media, repost_time,
+                           repost_city, repost_state, repost_country,
+                           repost_likes, repost_dislikes, repost_multimedia,
+                           username, social_media, post_time)
+            add_project_post(conn, project_name, username, social_media, post_time)
             
-            # Check if post already exists
-            cursor.execute("""
-                SELECT post_id FROM posts 
-                WHERE user_id = %s AND media_id = %s AND post_time = %s
-            """, (user_id, media_id, post_time))
-            existing_post = cursor.fetchone()
-            
-            if existing_post:
-                flash(f"Post already exists with ID {existing_post[0]}", "warning")
-                post_id = existing_post[0]
-            else:
-                # Create post
-                cursor.execute("""
-                    INSERT INTO posts (user_id, media_id, post_text, post_time, city, state, 
-                                     country, likes, dislikes, has_multimedia)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """, (user_id, media_id, post_text, post_time, city, state, 
-                     country, likes, dislikes, has_multimedia))
-                
-                conn.commit()
-                post_id = cursor.lastrowid
-                flash("Post added successfully", "success")
-            
-            # Check if we need to associate with a project
-            if 'project_id' in request.form and request.form['project_id']:
-                project_id = request.form['project_id']
-                
-                # Check if association already exists
-                cursor.execute("""
-                    SELECT 1 FROM project_posts 
-                    WHERE project_id = %s AND post_id = %s
-                """, (project_id, post_id))
-                if not cursor.fetchone():
-                    cursor.execute("""
-                        INSERT INTO project_posts (project_id, post_id)
-                        VALUES (%s, %s)
-                    """, (project_id, post_id))
-                    conn.commit()
-                    flash("Post associated with project", "success")
-            
-            cursor.close()
+
             conn.close()
-            return redirect(url_for('list_posts'))
+            
+            flash("Post added successfully", "success")
+            return redirect(url_for('entry'))
         
         flash("Database connection error", "danger")
-    
-    # GET request
-    conn = get_db_connection()
-    if conn:
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("""
-            SELECT u.username, sm.media_name
-            FROM users u
-            JOIN social_media sm ON u.media_id = sm.media_id
-        """)
-        users = cursor.fetchall()
+
+
+
+    # if request.method == 'POST':
+    #     media_name = request.form['media_name']
+    #     username = request.form['username']
+    #     post_text = request.form['post_text']
+    #     post_time = request.form['post_time']
+    #     city = request.form['city'] or None
+    #     state = request.form['state'] or None
+    #     country = request.form['country'] or None
+    #     likes = request.form['likes'] or 0
+    #     dislikes = request.form['dislikes'] or 0
+    #     has_multimedia = 'has_multimedia' in request.form
         
-        cursor.execute("SELECT project_id, project_name FROM projects")
-        projects = cursor.fetchall()
+    #     conn = get_db_connection()
+    #     if conn:
+    #         cursor = conn.cursor()
+            
+    #         # Get user ID
+    #         cursor.execute("""
+    #             SELECT u.user_id, sm.media_id FROM users u
+    #             JOIN social_media sm ON u.media_id = sm.media_id
+    #             WHERE sm.media_name = %s AND u.username = %s
+    #         """, (media_name, username))
+    #         user_info = cursor.fetchone()
+            
+    #         if not user_info:
+    #             flash(f"User {username} on {media_name} not found", "danger")
+    #             cursor.close()
+    #             conn.close()
+    #             return redirect(url_for('add_post'))
+            
+    #         user_id, media_id = user_info
+            
+    #         # Check if post already exists
+    #         cursor.execute("""
+    #             SELECT post_id FROM posts 
+    #             WHERE user_id = %s AND media_id = %s AND post_time = %s
+    #         """, (user_id, media_id, post_time))
+    #         existing_post = cursor.fetchone()
+            
+    #         if existing_post:
+    #             flash(f"Post already exists with ID {existing_post[0]}", "warning")
+    #             post_id = existing_post[0]
+    #         else:
+    #             # Create post
+    #             cursor.execute("""
+    #                 INSERT INTO posts (user_id, media_id, post_text, post_time, city, state, 
+    #                                  country, likes, dislikes, has_multimedia)
+    #                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    #             """, (user_id, media_id, post_text, post_time, city, state, 
+    #                  country, likes, dislikes, has_multimedia))
+                
+    #             conn.commit()
+    #             post_id = cursor.lastrowid
+    #             flash("Post added successfully", "success")
+            
+    #         # Check if we need to associate with a project
+    #         if 'project_id' in request.form and request.form['project_id']:
+    #             project_id = request.form['project_id']
+                
+    #             # Check if association already exists
+    #             cursor.execute("""
+    #                 SELECT 1 FROM project_posts 
+    #                 WHERE project_id = %s AND post_id = %s
+    #             """, (project_id, post_id))
+    #             if not cursor.fetchone():
+    #                 cursor.execute("""
+    #                     INSERT INTO project_posts (project_id, post_id)
+    #                     VALUES (%s, %s)
+    #                 """, (project_id, post_id))
+    #                 conn.commit()
+    #                 flash("Post associated with project", "success")
+            
+    #         cursor.close()
+    #         conn.close()
+    #         return redirect(url_for('list_posts'))
         
-        cursor.close()
-        conn.close()
-        return render_template('add_post.html', users=users, projects=projects)
+    #     flash("Database connection error", "danger")
     
-    flash("Database connection error", "danger")
-    return redirect(url_for('index'))
+    # # GET request
+    # conn = get_db_connection()
+    # if conn:
+    #     cursor = conn.cursor(dictionary=True)
+    #     cursor.execute("""
+    #         SELECT u.username, sm.media_name
+    #         FROM users u
+    #         JOIN social_media sm ON u.media_id = sm.media_id
+    #     """)
+    #     users = cursor.fetchall()
+        
+    #     cursor.execute("SELECT project_id, project_name FROM projects")
+    #     projects = cursor.fetchall()
+        
+    #     cursor.close()
+    #     conn.close()
+    #     return render_template('add_post.html', users=users, projects=projects)
+    
+    # flash("Database connection error", "danger")
+    # return redirect(url_for('index'))
 
 @app.route('/posts/<int:post_id>', methods=['GET'])
 def view_post(post_id):
@@ -566,48 +805,48 @@ def view_post(post_id):
     flash("Database connection error", "danger")
     return redirect(url_for('list_posts'))
 
-@app.route('/posts/repost', methods=['POST'])
-def add_repost():
-    post_id = request.form['post_id']
-    media_name = request.form['media_name']
-    username = request.form['username']
-    repost_time = request.form['repost_time']
+# @app.route('/posts/repost', methods=['GET', 'POST'])
+# def add_repost():
+#     post_id = request.form['post_id']
+#     media_name = request.form['media_name']
+#     username = request.form['username']
+#     repost_time = request.form['repost_time']
     
-    conn = get_db_connection()
-    if conn:
-        cursor = conn.cursor()
+#     conn = get_db_connection()
+#     if conn:
+#         cursor = conn.cursor()
         
-        # Get user ID
-        cursor.execute("""
-            SELECT user_id FROM users u
-            JOIN social_media sm ON u.media_id = sm.media_id
-            WHERE sm.media_name = %s AND u.username = %s
-        """, (media_name, username))
-        user_result = cursor.fetchone()
+#         # Get user ID
+#         cursor.execute("""
+#             SELECT user_id FROM users u
+#             JOIN social_media sm ON u.media_id = sm.media_id
+#             WHERE sm.media_name = %s AND u.username = %s
+#         """, (media_name, username))
+#         user_result = cursor.fetchone()
         
-        if not user_result:
-            flash(f"User {username} on {media_name} not found", "danger")
-            cursor.close()
-            conn.close()
-            return redirect(url_for('view_post', post_id=post_id))
+#         if not user_result:
+#             flash(f"User {username} on {media_name} not found", "danger")
+#             cursor.close()
+#             conn.close()
+#             return redirect(url_for('view_post', post_id=post_id))
         
-        user_id = user_result[0]
+#         user_id = user_result[0]
         
-        # Add repost
-        cursor.execute("""
-            INSERT INTO reposts (post_id, user_id, repost_time)
-            VALUES (%s, %s, %s)
-        """, (post_id, user_id, repost_time))
+#         # Add repost
+#         cursor.execute("""
+#             INSERT INTO reposts (post_id, user_id, repost_time)
+#             VALUES (%s, %s, %s)
+#         """, (post_id, user_id, repost_time))
         
-        conn.commit()
-        cursor.close()
-        conn.close()
+#         conn.commit()
+#         cursor.close()
+#         conn.close()
         
-        flash("Repost added successfully", "success")
-        return redirect(url_for('view_post', post_id=post_id))
+#         flash("Repost added successfully", "success")
+#         return redirect(url_for('view_post', post_id=post_id))
     
-    flash("Database connection error", "danger")
-    return redirect(url_for('view_post', post_id=post_id))
+#     flash("Database connection error", "danger")
+#     return redirect(url_for('view_post', post_id=post_id))
 
 # Analysis Results
 @app.route('/analysis/add', methods=['GET', 'POST'])
