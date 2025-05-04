@@ -89,11 +89,10 @@ CREATE TABLE Project_Post (
     post_username VARCHAR(40),
     post_social_media VARCHAR(100),
     post_time DATETIME,
-    post_text TEXT,
     PRIMARY KEY (project_name, post_username, post_social_media, post_time),
     FOREIGN KEY (project_name) REFERENCES Project(name),
-    FOREIGN KEY (post_username, post_social_media, post_time, post_text) 
-        REFERENCES Post(post_username, post_social_media, post_time, text)
+    FOREIGN KEY (post_username, post_social_media, post_time) 
+        REFERENCES Post(post_username, post_social_media, post_time)
 );
 
 -- Analysis_Result
