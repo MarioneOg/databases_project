@@ -1393,9 +1393,9 @@ def experiment_query():
     else:
         conn = get_db_connection()
         if not conn:
-            print("❌ DB 연결 실패!")
+            print("❌ DB connection failed")
         if conn:
-            print("✅ DB 연결 성공")
+            print("✅ DB connection success")
             cursor = conn.cursor(dictionary=True)
             cursor.execute("SELECT name FROM Project")
             experiments = cursor.fetchall()
