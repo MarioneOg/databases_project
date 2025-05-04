@@ -84,11 +84,10 @@ def expirement_query():
 def experiment_result():
     return render_template('experiment_result.html')
 
-@app.route('/post-results')
+@app.route('/post-results', methods=['GET'])
 def post_results():
-    query = request.form.to_dict()  
+    query = request.args.to_dict()
     return render_template('post_results.html', query=query)
-
 
 @app.route('/results')
 def results():

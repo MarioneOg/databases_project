@@ -66,7 +66,7 @@ document.getElementById("submit-post-btn").addEventListener("click", async (even
             results: data
         }));
   
-        window.location.href = "/post-results";
+        window.location.href = `/post-results?${params.toString()}`;
     } catch (err) {
         console.error("Failed to fetch results:", err);
         alert("An error occurred while querying the backend.");
