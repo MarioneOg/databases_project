@@ -45,7 +45,7 @@
             <input type="text" id="age" name="age" placeholder="Age" class="form-input" />
             <input type="text" id="gender" name="gender" placeholder="Gender" class="form-input" />
             <label for="verified">Verified:</label>
-            <select id="verified" name="verified" class="form-input" required>
+            <select id="verified" name="verified" class="form-input">
                 <option value="">-Select-</option>
                 <option value="1">Yes</option>
                 <option value="0">No</option>
@@ -86,7 +86,7 @@
 
         </form>
 
-        <form id="analysis-form" class="form-section hidden" method="POST" action="{{ url_for('add_analysis') }}">
+        <form id="analysis-form" class="form-section hidden" method="POST" action="{{ url_for('add_analysis_form') }}">
             <input type="text" id="project-name" name="project_name" placeholder="* Project Name" class="form-input" required/>
             <input type="text" id="username" name="username" placeholder="* Post Username" class="form-input" required/>
             <input type="text" id="social-media" name="social_media" placeholder="* Post Social Media" class="form-input" required />

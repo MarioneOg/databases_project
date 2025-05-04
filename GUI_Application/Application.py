@@ -240,6 +240,130 @@ def add_project_form():
     
     #     flash("Database connection error", "danger")
     #     return redirect(url_for('index'))
+        
+def add_field(conn, field_name, project_name):
+    cursor = conn.cursor()
+
+    # Check if the field exists
+    cursor.execute("""
+        SELECT * FROM Field
+        WHERE field_name = %s AND project_name = %s
+    """, (field_name, project_name))
+    check_field = cursor.fetchone()
+
+    if not check_field:
+        # Insert new field
+        cursor.execute("""
+            INSERT INTO Field (field_name, project_name)
+            VALUES (%s, %s)
+        """, (field_name, project_name))
+        conn.commit()
+
+    cursor.close()
+
+def add_analysis(conn, project_name, username, social_media, post_time, field_name, analysis):
+    cursor = conn.cursor()
+
+    # Check if analysis exists
+    cursor.execute("""
+        SELECT * FROM Analysis_Result
+        WHERE project_name = %s AND post_username = %s AND post_social_media = %s AND post_time = %s AND field_name = %s
+    """, (project_name, username, social_media, post_time, field_name))
+    check_analysis = cursor.fetchone()
+
+    if not check_analysis:
+        # Insert new analysis
+        cursor.execute("""
+            INSERT INTO Analysis_Result (project_name, post_username, post_social_media, post_time, field_name, analysis)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (project_name, username, social_media, post_time, field_name, analysis))
+        conn.commit()
+
+    cursor.close()
+
+def find_project(conn, project_name):
+    cursor = conn.cursor()
+
+    # Find user
+    cursor.execute("""
+        SELECT * FROM Project
+        WHERE name = %s
+    """, (project_name,))
+    project = cursor.fetchone()
+
+    if project:
+        return True
+    else:
+        return False
+
+def find_user(conn, username, social_media):
+    cursor = conn.cursor()
+
+    # Find user
+    cursor.execute("""
+        SELECT * FROM User
+        WHERE username = %s AND social_media = %s
+    """, (username, social_media))
+    user = cursor.fetchone()
+
+    if user:
+        return True
+    else:
+        return False
+    
+def find_post(conn, username, social_media, post_time):
+    cursor = conn.cursor()
+
+    # Find user
+    cursor.execute("""
+        SELECT * FROM Post
+        WHERE post_username = %s AND post_social_media = %s AND post_time = %s
+    """, (username, social_media, post_time))
+    post = cursor.fetchone()
+
+    if post:
+        return True
+    else:
+        return False
+
+        
+@app.route('/analysis/add', methods=['GET', 'POST'])
+def add_analysis_form():
+    if request.method == 'POST':
+        project_name = request.form['project_name']
+        username = request.form['username']
+        social_media = request.form['social_media'] 
+        post_time = request.form['post_time'] 
+        field_name = request.form['field_name'] 
+        analysis = request.form['analysis'] or None
+
+        conn = get_db_connection()
+        if conn:
+            cursor = conn.cursor()
+
+            project = find_project(conn, project_name)
+            user = find_user(conn, username, social_media)
+            post = find_post(conn, username, social_media, post_time)
+
+            if project and user and post:
+                # Add field
+                add_field(conn, field_name, project_name)
+                
+                # Add analysis
+                add_analysis(conn, project_name, username, social_media, post_time, field_name, analysis)
+
+                flash("Analysis added successfully", "success")
+                return redirect(url_for('entry'))
+            else:
+                flash("Project, user, or post not found", "danger")
+                return redirect(url_for('entry'))
+
+            # # Check if analysis exists
+            # cursor.execute("""
+            #     SELECT * FROM Analysis
+            #     WHERE project_name = %s AND post_username = %s AND post_social_media = %s AND post_time = %s AND field_name = %s
+            # """, (project_name, username, social_media, post_time, field_name))
+            # check_analysis = cursor.fetchone()
 
 @app.route('/projects/<int:project_id>', methods=['GET'])
 def view_project(project_id):
@@ -900,120 +1024,120 @@ def view_post(post_id):
 #     return redirect(url_for('view_post', post_id=post_id))
 
 # Analysis Results
-@app.route('/analysis/add', methods=['GET', 'POST'])
-def add_analysis():
-    if request.method == 'POST':
-        project_id = request.form['project_id']
-        post_id = request.form['post_id']
+# @app.route('/analysis/add', methods=['GET', 'POST'])
+# def add_analysis():
+#     if request.method == 'POST':
+#         project_id = request.form['project_id']
+#         post_id = request.form['post_id']
         
-        conn = get_db_connection()
-        if conn:
-            cursor = conn.cursor()
+#         conn = get_db_connection()
+#         if conn:
+#             cursor = conn.cursor()
             
-            # Get all fields for the project
-            cursor.execute("SELECT field_id, field_name FROM project_fields WHERE project_id = %s", (project_id,))
-            project_fields = cursor.fetchall()
+#             # Get all fields for the project
+#             cursor.execute("SELECT field_id, field_name FROM project_fields WHERE project_id = %s", (project_id,))
+#             project_fields = cursor.fetchall()
             
-            # Check if post is associated with project
-            cursor.execute("SELECT 1 FROM project_posts WHERE project_id = %s AND post_id = %s", (project_id, post_id))
-            if not cursor.fetchone():
-                # Associate post with project
-                cursor.execute("INSERT INTO project_posts (project_id, post_id) VALUES (%s, %s)", (project_id, post_id))
-                conn.commit()
+#             # Check if post is associated with project
+#             cursor.execute("SELECT 1 FROM project_posts WHERE project_id = %s AND post_id = %s", (project_id, post_id))
+#             if not cursor.fetchone():
+#                 # Associate post with project
+#                 cursor.execute("INSERT INTO project_posts (project_id, post_id) VALUES (%s, %s)", (project_id, post_id))
+#                 conn.commit()
             
-            # Process field values
-            for field_id, field_name in project_fields:
-                field_key = f"field_{field_id}"
-                if field_key in request.form:
-                    result_value = request.form[field_key]
+#             # Process field values
+#             for field_id, field_name in project_fields:
+#                 field_key = f"field_{field_id}"
+#                 if field_key in request.form:
+#                     result_value = request.form[field_key]
                     
-                    # Check if result already exists
-                    cursor.execute("""
-                        SELECT result_id FROM analysis_results 
-                        WHERE project_id = %s AND post_id = %s AND field_id = %s
-                    """, (project_id, post_id, field_id))
-                    existing_result = cursor.fetchone()
+#                     # Check if result already exists
+#                     cursor.execute("""
+#                         SELECT result_id FROM analysis_results 
+#                         WHERE project_id = %s AND post_id = %s AND field_id = %s
+#                     """, (project_id, post_id, field_id))
+#                     existing_result = cursor.fetchone()
                     
-                    if existing_result:
-                        # Update existing result
-                        cursor.execute("""
-                            UPDATE analysis_results SET result_value = %s
-                            WHERE project_id = %s AND post_id = %s AND field_id = %s
-                        """, (result_value, project_id, post_id, field_id))
-                    else:
-                        # Create new result
-                        cursor.execute("""
-                            INSERT INTO analysis_results (project_id, post_id, field_id, result_value)
-                            VALUES (%s, %s, %s, %s)
-                        """, (project_id, post_id, field_id, result_value))
+#                     if existing_result:
+#                         # Update existing result
+#                         cursor.execute("""
+#                             UPDATE analysis_results SET result_value = %s
+#                             WHERE project_id = %s AND post_id = %s AND field_id = %s
+#                         """, (result_value, project_id, post_id, field_id))
+#                     else:
+#                         # Create new result
+#                         cursor.execute("""
+#                             INSERT INTO analysis_results (project_id, post_id, field_id, result_value)
+#                             VALUES (%s, %s, %s, %s)
+#                         """, (project_id, post_id, field_id, result_value))
             
-            conn.commit()
-            cursor.close()
-            conn.close()
+#             conn.commit()
+#             cursor.close()
+#             conn.close()
             
-            flash("Analysis results saved successfully", "success")
-            return redirect(url_for('view_project', project_id=project_id))
+#             flash("Analysis results saved successfully", "success")
+#             return redirect(url_for('view_project', project_id=project_id))
         
-        flash("Database connection error", "danger")
+#         flash("Database connection error", "danger")
     
-    # GET request
-    project_id = request.args.get('project_id')
-    post_id = request.args.get('post_id')
+#     # GET request
+#     project_id = request.args.get('project_id')
+#     post_id = request.args.get('post_id')
     
-    if not project_id or not post_id:
-        flash("Missing project or post information", "danger")
-        return redirect(url_for('index'))
+#     if not project_id or not post_id:
+#         flash("Missing project or post information", "danger")
+#         return redirect(url_for('index'))
     
-    conn = get_db_connection()
-    if conn:
-        cursor = conn.cursor(dictionary=True)
+#     conn = get_db_connection()
+#     if conn:
+#         cursor = conn.cursor(dictionary=True)
         
-        # Get project details
-        cursor.execute("SELECT project_id, project_name FROM projects WHERE project_id = %s", (project_id,))
-        project = cursor.fetchone()
+#         # Get project details
+#         cursor.execute("SELECT project_id, project_name FROM projects WHERE project_id = %s", (project_id,))
+#         project = cursor.fetchone()
         
-        if not project:
-            flash("Project not found", "danger")
-            cursor.close()
-            conn.close()
-            return redirect(url_for('index'))
+#         if not project:
+#             flash("Project not found", "danger")
+#             cursor.close()
+#             conn.close()
+#             return redirect(url_for('index'))
         
-        # Get post details
-        cursor.execute("""
-            SELECT p.post_id, p.post_text, sm.media_name, u.username, p.post_time
-            FROM posts p
-            JOIN users u ON p.user_id = u.user_id
-            JOIN social_media sm ON p.media_id = sm.media_id
-            WHERE p.post_id = %s
-        """, (post_id,))
-        post = cursor.fetchone()
+#         # Get post details
+#         cursor.execute("""
+#             SELECT p.post_id, p.post_text, sm.media_name, u.username, p.post_time
+#             FROM posts p
+#             JOIN users u ON p.user_id = u.user_id
+#             JOIN social_media sm ON p.media_id = sm.media_id
+#             WHERE p.post_id = %s
+#         """, (post_id,))
+#         post = cursor.fetchone()
         
-        if not post:
-            flash("Post not found", "danger")
-            cursor.close()
-            conn.close()
-            return redirect(url_for('view_project', project_id=project_id))
+#         if not post:
+#             flash("Post not found", "danger")
+#             cursor.close()
+#             conn.close()
+#             return redirect(url_for('view_project', project_id=project_id))
         
-        # Get fields for this project
-        cursor.execute("SELECT field_id, field_name FROM project_fields WHERE project_id = %s", (project_id,))
-        fields = cursor.fetchall()
+#         # Get fields for this project
+#         cursor.execute("SELECT field_id, field_name FROM project_fields WHERE project_id = %s", (project_id,))
+#         fields = cursor.fetchall()
         
-        # Get existing results
-        cursor.execute("""
-            SELECT field_id, result_value
-            FROM analysis_results
-            WHERE project_id = %s AND post_id = %s
-        """, (project_id, post_id))
-        existing_results = {result['field_id']: result['result_value'] for result in cursor.fetchall()}
+#         # Get existing results
+#         cursor.execute("""
+#             SELECT field_id, result_value
+#             FROM analysis_results
+#             WHERE project_id = %s AND post_id = %s
+#         """, (project_id, post_id))
+#         existing_results = {result['field_id']: result['result_value'] for result in cursor.fetchall()}
 
-        cursor.close()
-        conn.close()
+#         cursor.close()
+#         conn.close()
         
-        return render_template('add_analysis.html', project=project, post=post, 
-                               fields=fields, existing_results=existing_results)
+#         return render_template('add_analysis.html', project=project, post=post, 
+#                                fields=fields, existing_results=existing_results)
     
-    flash("Database connection error", "danger")
-    return redirect(url_for('index'))
+#     flash("Database connection error", "danger")
+#     return redirect(url_for('index'))
 
 # Query Routes
 @app.route('/query/posts', methods=['GET', 'POST'])
