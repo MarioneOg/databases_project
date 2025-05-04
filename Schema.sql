@@ -3,7 +3,7 @@ CREATE DATABASE IF NOT EXISTS social_media_analysis;
 USE social_media_analysis;
 
 -- SocialMedia
-CREATE TABLE SocialMedia (
+CREATE TABLE Social_Media (
     name VARCHAR(100) PRIMARY KEY
 );
 
@@ -19,14 +19,14 @@ CREATE TABLE User (
     gender VARCHAR(20),
     is_verified BOOLEAN DEFAULT FALSE,
     PRIMARY KEY (username, social_media),
-    FOREIGN KEY (social_media) REFERENCES SocialMedia(name)
+    FOREIGN KEY (social_media) REFERENCES Social_Media(name)
 );
 
 -- Post 테이블 생성
 CREATE TABLE Post (
     post_username VARCHAR(40),
     post_social_media VARCHAR(100),
-    post_time DATETIME,
+    post_time TIME,
     text TEXT,
     likes INT DEFAULT 0 CHECK(likes >= 0),
     dislikes INT DEFAULT 0 CHECK(dislikes >= 0),
@@ -42,15 +42,15 @@ CREATE TABLE Post (
 CREATE TABLE Repost (
     original_post_username VARCHAR(40),
     original_social_media VARCHAR(100),
-    original_post_time DATETIME,
+    original_post_time TIME,
     repost_username VARCHAR(40),
     repost_social_media VARCHAR(100),
-    repost_time DATETIME CHECK(repost_time > original_post_time),
+    repost_time TIME,
     repost_location_city VARCHAR(100),
     repost_location_state VARCHAR(100),
     repost_location_country VARCHAR(100),
-    repost_likes INT DEFAULT 0 CHECK(repost_likes >= 0),
-    repost_dislikes INT DEFAULT 0 CHECK(repost_dislikes >= 0),
+    repost_likes INT DEFAULT 0,
+    repost_dislikes INT DEFAULT 0,
     repost_has_multimedia BOOLEAN DEFAULT FALSE,
     PRIMARY KEY (repost_username, repost_social_media, repost_time),
     FOREIGN KEY (original_post_username, original_social_media, original_post_time) 
@@ -71,7 +71,7 @@ CREATE TABLE Project (
     manager_lastname VARCHAR(100),
     institute_name VARCHAR(200),
     start_date DATE,
-    end_date DATE CHECK(end_date >= start_date),
+    end_date DATE,
     FOREIGN KEY (institute_name) REFERENCES Institute(name)
 );
 
@@ -88,11 +88,12 @@ CREATE TABLE Project_Post (
     project_name VARCHAR(200),
     post_username VARCHAR(40),
     post_social_media VARCHAR(100),
-    post_time DATETIME,
+    post_time TIME,
+    post_text TEXT,
     PRIMARY KEY (project_name, post_username, post_social_media, post_time),
     FOREIGN KEY (project_name) REFERENCES Project(name),
-    FOREIGN KEY (post_username, post_social_media, post_time) 
-        REFERENCES Post(post_username, post_social_media, post_time)
+    FOREIGN KEY (post_username, post_social_media, post_time, post_text) 
+        REFERENCES Post(post_username, post_social_media, post_time, text)
 );
 
 -- Analysis_Result
@@ -100,7 +101,7 @@ CREATE TABLE Analysis_Result (
     project_name VARCHAR(200),
     post_username VARCHAR(40),
     post_social_media VARCHAR(100),
-    post_time DATETIME,
+    post_time TIME,
     field_name VARCHAR(100),
     analysis TEXT,
     PRIMARY KEY (project_name, post_username, post_social_media, post_time, field_name),
