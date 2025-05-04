@@ -77,6 +77,11 @@ document.getElementById("submit-post-btn").addEventListener("click", async (even
 // Query an experiment
 document.getElementById("submit-exp-btn").addEventListener("click", async (event) => {
     const experimentName = document.getElementById("experiment-name").value.trim();
+
+
+    const params = new URLSearchParams({
+        experiment_name: experimentName
+    });
   
     try {
         
