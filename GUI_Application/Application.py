@@ -1392,6 +1392,7 @@ def experiment_query():
 # GET request - show form to query experiment
     else:
         conn = get_db_connection()
+        # debug
         if not conn:
             print("❌ DB connection failed")
         if conn:
@@ -1420,7 +1421,13 @@ def query_experiment(experiment_name):
             """, (experiment_name,))
             
             project = cursor.fetchone()
-            
+
+            # convert date
+            if project and 'start_date' in project and project['start_date']:
+                project['start_date'] = str(project['start_date'])
+            if project and 'end_date' in project and project['end_date']:
+                project['end_date'] = str(project['end_date'])
+                
             if not project:
                 return {"status": "error", "message": "Project not found"}
             

@@ -77,8 +77,8 @@
                         <p><strong>Institute:</strong> {{ project.institute_name }}</p>
                     </div>
                     <div class="col-md-6">
-                        <p><strong>Start Date:</strong> {{ project.start_date.strftime('%Y-%m-%d') }}</p>
-                        <p><strong>End Date:</strong> {{ project.end_date.strftime('%Y-%m-%d') }}</p>
+                        <p><strong>Start Date:</strong> {{ project.start_date }}</p>
+                        <p><strong>End Date:</strong> {{ project.end_date }}</p>
                     </div>
                 </div>
             </div>
@@ -142,7 +142,7 @@
                                     <tr>
                                         <td>{{ post.post_social_media }}</td>
                                         <td>{{ post.post_username }}</td>
-                                        <td>{{ post.post_time.strftime('%H:%M') }}</td>
+                                        <td>{{ post.post_time }}</td>
                                         <td>
                                             <div style="max-height: 100px; overflow-y: auto;">
                                                 {{ post.text|truncate(200) }}

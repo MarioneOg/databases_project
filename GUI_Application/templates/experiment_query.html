@@ -58,12 +58,8 @@
                 <form method="POST" action="{{ url_for('experiment_query') }}">
                     <div class="mb-3">
                         <label for="experiment_name" class="form-label">Experiment Name</label>
-                        <select class="form-select" id="experiment_name" name="experiment_name" required>
-                            <option value="">-- Select Experiment --</option>
-                            {% for experiment in experiments %}
-                                <option value="{{ experiment['name'] }}">{{ experiment['name'] }}</option>
-                            {% endfor %}
-                        </select>
+                        <input type="text" class="form-control" id="experiment_name" name="experiment_name" required>
+                        <small class="form-text text-muted">예: Political Analysis 2025 또는 Social Media Trends</small>
                     </div>
                     
                     <div class="text-end">
