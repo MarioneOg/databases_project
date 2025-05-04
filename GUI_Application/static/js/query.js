@@ -29,20 +29,12 @@ buttons.forEach(button => {
 // Query a post
 document.getElementById("submit-post-btn").addEventListener("click", async (event) => {
     const socialMedia = document.getElementById("social-media").value.trim();
-    const startDate = document.getElementById("start-date").value.trim();
-    const endDate = document.getElementById("end-date").value.trim();
-
-    if (new Date(endDate) < new Date(startDate)) {
-        event.preventDefault();  // Prevent form submission
-        alert("End date cannot be earlier than the start date.");
-        return;
-    }
-
+    const postTime = document.getElementById("post-time").value.trim();
     const username = document.getElementById("username").value.trim();
     const firstName = document.getElementById("first-name").value.trim();
     const lastName = document.getElementById("last-name").value.trim();
   
-    if (!socialMedia && !startDate && !endDate && !username && !firstName && !lastName) {
+    if (!socialMedia && !postTime && !username && !firstName && !lastName) {
         event.preventDefault();  // Prevent form submission
         alert("Please fill out at least one field.");
         return;
@@ -50,8 +42,7 @@ document.getElementById("submit-post-btn").addEventListener("click", async (even
 
     const params = new URLSearchParams({
         socialMedia,
-        startDate,
-        endDate,
+        postTime,
         username,
         firstName,
         lastName
