@@ -168,7 +168,6 @@ def add_project_form():
         if conn:
             cursor = conn.cursor()
             
-            institute = None
             # Check if institute exists
             if institute_name:
                 cursor.execute("SELECT name FROM Institute WHERE name = %s", (institute_name,))
@@ -178,18 +177,35 @@ def add_project_form():
                     # Create institute
                     cursor.execute("INSERT INTO Institute (name) VALUES (%s)", (institute_name,))
                     # institute_id = cursor.lastrowid
+                else:
+                    cursor.execute("UPDATE Institute SET name = (%s)", (institute_name,))
             # else:
             #     institute_id = institute[0]
             
             # Create project
             cursor.execute("""
-                INSERT INTO Project (name, manager_firstname, manager_lastname, 
+                SELECT * FROM Project
+                WHERE name = %s
+            """, (project_name,))
+            check_project = cursor.fetchone()
+
+            if not check_project:
+                cursor.execute("""
+                    INSERT INTO Project (name, manager_firstname, manager_lastname, 
                                      institute_name, start_date, end_date)
-                VALUES (%s, %s, %s, %s, %s, %s)
-            """, (project_name, manager_first_name, manager_last_name, 
-                 institute_name, start_date, end_date))
-            
-            conn.commit()
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                """, (project_name, manager_first_name, manager_last_name, 
+                institute_name, start_date, end_date))
+                conn.commit()
+            else:
+                cursor.execute("""
+                    UPDATE Project 
+                    SET manager_firstname = (%s), manager_lastname = (%s), 
+                               institute_name = (%s), start_date = (%s), end_date = (%s)
+                    WHERE name = %s
+                """, (manager_first_name, manager_last_name, 
+                institute_name, start_date, end_date, project_name))
+                conn.commit()
             # project_id = cursor.lastrowid
             
             # Handle project fields
@@ -418,6 +434,9 @@ def add_social_media(conn, social_media):
         # Insert it if it's not already in the table
         cursor.execute("INSERT INTO Social_Media (name) VALUES (%s)", (social_media,))
         conn.commit()
+    else:
+        cursor.execute("UPDATE Social_Media SET name = (%s)", (social_media,))
+        conn.commit()
 
     cursor.close()
 
@@ -447,6 +466,20 @@ def add_user(conn, username, social_media, first_name, last_name, country_birth,
 def add_post(conn, username, social_media, post_time, text, likes, dislikes, city, state, country, multimedia):
     cursor = conn.cursor()
 
+    # Add the social media to the social media database
+    cursor.execute("""
+        SELECT * FROM Social_Media
+        WHERE name = %s
+    """, (social_media,))
+    check_media = cursor.fetchone()
+
+    if not check_media:
+        cursor.execute("""
+            INSERT INTO Social_Media (name)
+            VALUES (%s)
+        """, (social_media,))
+        conn.commit()
+
     # Check if original post exists
     cursor.execute("""
         SELECT * FROM Post
@@ -469,6 +502,7 @@ def add_repost(conn,
                repost_likes, repost_dislikes, repost_multimedia,
                original_username, original_social_media, original_post_time):
     cursor = conn.cursor()
+
 
     # Check if repost social media exists
     cursor.execute("SELECT name FROM Social_Media WHERE name = %s", (repost_social_media,))
@@ -543,6 +577,20 @@ def add_repost(conn,
         repost_likes, repost_dislikes, repost_multimedia
     ))
 
+    # Add to post as well
+    cursor.execute("""
+        INSERT INTO Post (
+            post_username, post_social_media, post_time,
+            likes, dislikes, location_city, location_state, location_country,
+            has_multimedia
+        )
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+    """, (
+        repost_username, repost_social_media, repost_time,
+        repost_likes, repost_dislikes, repost_city, repost_state, repost_country,
+        repost_multimedia
+    ))
+
     conn.commit()
     print("Finished insert")
     cursor.close()
@@ -589,7 +637,8 @@ def add_post_form():
         gender = request.form['gender'] or None
         verified = request.form['verified'] or None
 
-        post_time = request.form['post_time']
+        post_time_raw = request.form['post_time']
+        post_time = post_time_raw.replace('T', ' ') + ":00"
         text = request.form['text'] or None
         likes = request.form['likes'] or None
         dislikes = request.form['dislikes'] or None
@@ -600,7 +649,9 @@ def add_post_form():
 
         repost_username = request.form['repost_username'] or None
         repost_social_media = request.form['repost_social_media'] or None
-        repost_time = request.form['repost_time'] or None
+        repost_time_raw = request.form['repost_time'] or None
+        if repost_time_raw:
+            repost_time = post_time_raw.replace('T', ' ') + ":00"
         repost_city = request.form['repost_city'] or None
         repost_state = request.form['repost_state'] or None
         repost_country = request.form['repost_country'] or None

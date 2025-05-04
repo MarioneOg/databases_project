@@ -99,5 +99,10 @@ document.getElementById("submit-analysis").addEventListener("click", () => {
     console.log("Analysis submission:", analysisData);
     // Backend connection goes here???
 });
+
+document.getElementById("toggle-repost").addEventListener("click", () => {
+    const repostSection = document.getElementById("repost-section");
+    repostSection.classList.toggle("hidden");
+});
   
 
