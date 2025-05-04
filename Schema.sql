@@ -26,7 +26,7 @@ CREATE TABLE User (
 CREATE TABLE Post (
     post_username VARCHAR(40),
     post_social_media VARCHAR(100),
-    post_time TIME,
+    post_time DATETIME,
     text TEXT,
     likes INT DEFAULT 0 CHECK(likes >= 0),
     dislikes INT DEFAULT 0 CHECK(dislikes >= 0),
@@ -42,10 +42,10 @@ CREATE TABLE Post (
 CREATE TABLE Repost (
     original_post_username VARCHAR(40),
     original_social_media VARCHAR(100),
-    original_post_time TIME,
+    original_post_time DATETIME,
     repost_username VARCHAR(40),
     repost_social_media VARCHAR(100),
-    repost_time TIME,
+    repost_time DATETIME,
     repost_location_city VARCHAR(100),
     repost_location_state VARCHAR(100),
     repost_location_country VARCHAR(100),
@@ -88,11 +88,12 @@ CREATE TABLE Project_Post (
     project_name VARCHAR(200),
     post_username VARCHAR(40),
     post_social_media VARCHAR(100),
-    post_time TIME,
+    post_time DATETIME,
+    post_text TEXT,
     PRIMARY KEY (project_name, post_username, post_social_media, post_time),
     FOREIGN KEY (project_name) REFERENCES Project(name),
-    FOREIGN KEY (post_username, post_social_media, post_time) 
-        REFERENCES Post(post_username, post_social_media, post_time)
+    FOREIGN KEY (post_username, post_social_media, post_time, post_text) 
+        REFERENCES Post(post_username, post_social_media, post_time, text)
 );
 
 -- Analysis_Result
@@ -100,7 +101,7 @@ CREATE TABLE Analysis_Result (
     project_name VARCHAR(200),
     post_username VARCHAR(40),
     post_social_media VARCHAR(100),
-    post_time TIME,
+    post_time DATETIME,
     field_name VARCHAR(100),
     analysis TEXT,
     PRIMARY KEY (project_name, post_username, post_social_media, post_time, field_name),
