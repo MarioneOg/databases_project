@@ -210,6 +210,7 @@ def add_project():
             return redirect(url_for('entry'))
         
         flash("Database connection error", "danger")
+
     
     # # GET request
     # else:
