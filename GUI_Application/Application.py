@@ -1367,8 +1367,6 @@ def query_posts_experiments():
     flash("Database connection error", "danger")
     return redirect(url_for('index'))
 
-if __name__ == '__main__':
-    app.run(debug=True)
 
 # experiment query
 @app.route('/experiment_query', methods=['GET', 'POST'])
@@ -1497,3 +1495,7 @@ def query_experiment(experiment_name):
                 conn.close()
     
     return {"status": "error", "message": "Database connection failed"}
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
