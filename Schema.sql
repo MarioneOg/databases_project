@@ -22,7 +22,7 @@ CREATE TABLE User (
     FOREIGN KEY (social_media) REFERENCES Social_Media(name)
 );
 
--- Post 테이블 생성
+-- Post
 CREATE TABLE Post (
     post_username VARCHAR(40),
     post_social_media VARCHAR(100),
@@ -38,7 +38,7 @@ CREATE TABLE Post (
     FOREIGN KEY (post_username, post_social_media) REFERENCES User(username, social_media)
 );
 
--- Repost 테이블 생성
+-- Repost
 CREATE TABLE Repost (
     original_post_username VARCHAR(40),
     original_social_media VARCHAR(100),
@@ -89,11 +89,10 @@ CREATE TABLE Project_Post (
     post_username VARCHAR(40),
     post_social_media VARCHAR(100),
     post_time TIME,
-    post_text TEXT,
     PRIMARY KEY (project_name, post_username, post_social_media, post_time),
     FOREIGN KEY (project_name) REFERENCES Project(name),
-    FOREIGN KEY (post_username, post_social_media, post_time, post_text) 
-        REFERENCES Post(post_username, post_social_media, post_time, text)
+    FOREIGN KEY (post_username, post_social_media, post_time) 
+        REFERENCES Post(post_username, post_social_media, post_time)
 );
 
 -- Analysis_Result

@@ -1367,7 +1367,6 @@ def query_posts_experiments():
     flash("Database connection error", "danger")
     return redirect(url_for('index'))
 
-
 # experiment query
 @app.route('/experiment_query', methods=['GET', 'POST'])
 def experiment_query():
@@ -1375,7 +1374,7 @@ def experiment_query():
         experiment_name = request.form.get('experiment_name')
         
         if not experiment_name:
-            flash('Please enter an experiment name', 'danger')
+            flash('Please enter a project name', 'danger')
             return redirect(url_for('experiment_query'))
         
         result = query_experiment(experiment_name)
@@ -1391,20 +1390,21 @@ def experiment_query():
             posts=result['posts'],
             field_stats=result['field_stats']
         )
-    
-    # GET request - show form to query experiment
-    conn = get_db_connection()
-    if conn:
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT project_name FROM projects")
-        experiments = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        
-        return render_template('experiment_query.html', experiments=experiments)
-    
-    flash('Database connection failed', 'danger')
-    return redirect(url_for('index'))
+# GET request - show form to query experiment
+    else:
+        conn = get_db_connection()
+        if not conn:
+            print("❌ DB 연결 실패!")
+        if conn:
+            print("✅ DB 연결 성공")
+            cursor = conn.cursor(dictionary=True)
+            cursor.execute("SELECT name FROM Project")
+            experiments = cursor.fetchall()
+            print("🔍 Query results:", experiments, flush=True)
+            cursor.close()
+            conn.close()
+            return render_template('experiment_query.html', experiments=experiments)
+
 
 def query_experiment(experiment_name):
     conn = get_db_connection()
@@ -1414,49 +1414,52 @@ def query_experiment(experiment_name):
             
             # Get project details
             cursor.execute("""
-                SELECT project_id, project_name, manager_first_name, manager_last_name, 
-                       institute_id, start_date, end_date
-                FROM projects 
-                WHERE project_name = %s
+                SELECT name, manager_firstname, manager_lastname, 
+                       institute_name, start_date, end_date
+                FROM Project 
+                WHERE name = %s
             """, (experiment_name,))
             
             project = cursor.fetchone()
             
             if not project:
-                return {"status": "error", "message": "Experiment not found"}
+                return {"status": "error", "message": "Project not found"}
             
             # Get fields for this project
             cursor.execute("""
-                SELECT field_id, field_name
-                FROM project_fields
-                WHERE project_id = %s
-            """, (project['project_id'],))
+                SELECT field_name
+                FROM Field
+                WHERE project_name = %s
+            """, (experiment_name,))
             
             fields = cursor.fetchall()
             
             # Get posts associated with this project
             cursor.execute("""
-                SELECT pp.post_id, p.post_text, sm.media_name, u.username, p.post_time
-                FROM project_posts pp
-                JOIN posts p ON pp.post_id = p.post_id
-                JOIN users u ON p.user_id = u.user_id
-                JOIN social_media sm ON p.media_id = sm.media_id
-                WHERE pp.project_id = %s
-            """, (project['project_id'],))
+                SELECT pp.post_username, pp.post_social_media, pp.post_time,
+                       p.text, p.likes, p.dislikes, p.location_city, p.location_state, p.location_country, p.has_multimedia
+                FROM Project_Post pp
+                JOIN Post p ON pp.post_username = p.post_username 
+                               AND pp.post_social_media = p.post_social_media
+                               AND pp.post_time = p.post_time
+                WHERE pp.project_name = %s
+            """, (experiment_name,))
             
             posts = cursor.fetchall()
             
             # Get analysis results for each post
             for post in posts:
                 cursor.execute("""
-                    SELECT pf.field_name, ar.result_value
-                    FROM analysis_results ar
-                    JOIN project_fields pf ON ar.field_id = pf.field_id
-                    WHERE ar.project_id = %s AND ar.post_id = %s
-                """, (project['project_id'], post['post_id']))
+                    SELECT field_name, analysis
+                    FROM Analysis_Result
+                    WHERE project_name = %s 
+                      AND post_username = %s
+                      AND post_social_media = %s
+                      AND post_time = %s
+                """, (experiment_name, post['post_username'], post['post_social_media'], post['post_time']))
                 
                 results = cursor.fetchall()
-                post['results'] = {result['field_name']: result['result_value'] for result in results}
+                post['results'] = {result['field_name']: result['analysis'] for result in results}
             
             # Calculate field statistics
             field_stats = {}
@@ -1465,7 +1468,7 @@ def query_experiment(experiment_name):
                 field_stats[field_name] = {'total': len(posts), 'filled': 0}
                 
                 for post in posts:
-                    if field_name in post['results'] and post['results'][field_name]:
+                    if field_name in post.get('results', {}) and post['results'][field_name]:
                         field_stats[field_name]['filled'] += 1
             
             # Convert to percentages
@@ -1495,7 +1498,6 @@ def query_experiment(experiment_name):
                 conn.close()
     
     return {"status": "error", "message": "Database connection failed"}
-
 
 if __name__ == '__main__':
     app.run(debug=True)

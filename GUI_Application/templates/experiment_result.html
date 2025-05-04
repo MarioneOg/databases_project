@@ -68,13 +68,13 @@
         
         <div class="card">
             <div class="card-header">
-                <h3>{{ project.project_name }}</h3>
+                <h3>{{ project.name }}</h3>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">
-                        <p><strong>Manager:</strong> {{ project.manager_first_name }} {{ project.manager_last_name }}</p>
-                        <p><strong>Institute ID:</strong> {{ project.institute_id }}</p>
+                        <p><strong>Manager:</strong> {{ project.manager_firstname }} {{ project.manager_lastname }}</p>
+                        <p><strong>Institute:</strong> {{ project.institute_name }}</p>
                     </div>
                     <div class="col-md-6">
                         <p><strong>Start Date:</strong> {{ project.start_date.strftime('%Y-%m-%d') }}</p>
@@ -140,12 +140,12 @@
                             <tbody>
                                 {% for post in posts %}
                                     <tr>
-                                        <td>{{ post.media_name }}</td>
-                                        <td>{{ post.username }}</td>
-                                        <td>{{ post.post_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td>{{ post.post_social_media }}</td>
+                                        <td>{{ post.post_username }}</td>
+                                        <td>{{ post.post_time.strftime('%H:%M') }}</td>
                                         <td>
                                             <div style="max-height: 100px; overflow-y: auto;">
-                                                {{ post.post_text|truncate(200) }}
+                                                {{ post.text|truncate(200) }}
                                             </div>
                                         </td>
                                         <td>

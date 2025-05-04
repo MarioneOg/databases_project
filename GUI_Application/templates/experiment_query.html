@@ -62,7 +62,7 @@
                         <select class="form-select" id="experiment_name" name="experiment_name" required>
                             <option value="">-- Select Experiment --</option>
                             {% for experiment in experiments %}
-                                <option value="{{ experiment.project_name }}">{{ experiment.project_name }}</option>
+                                <option value="{{ experiment['name'] }}">{{ experiment['name'] }}</option>
                             {% endfor %}
                         </select>
                     </div>
