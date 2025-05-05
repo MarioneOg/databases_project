@@ -1316,7 +1316,7 @@ def search_posts():
 
             if not posts:
                 print("POST NOT FOUND")
-                return jsonify([])  # Return empty JSON array if no results found
+                return render_template('post_results.html', query=query_params, posts=[])  # Return empty JSON array if no results found
 
             # Process the posts and include project names
             for post in posts:
