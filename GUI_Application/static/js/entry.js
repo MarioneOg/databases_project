@@ -49,11 +49,24 @@ document.getElementById("submit-project").addEventListener("click", () => {
     document.getElementById("submit-post").addEventListener("click", (event) => {
         event.preventDefault(); 
         const ageValue = document.getElementById("age").value.trim();
+        const likes = document.getElementById("likes").value.trim();
+        const dislikes = document.getElementById("dislikes").value.trim();
 
         if (isNaN(ageValue) || Number(ageValue) < 0) {
             alert("Age must be a non-negative number.");
             return; // Stop form submission
         }
+
+        if (isNaN(likes) || Number(likes) < 0) {
+            alert("Likes must be a non-negative number.");
+            return; // Stop form submission
+        }
+
+        if (isNaN(dislikes) || Number(dislikes) < 0) {
+            alert("Dislikes must be a non-negative number.");
+            return; // Stop form submission
+        }
+
 
         const postData = {
             project_name: document.getElementById("post-project-name").value.trim(),
