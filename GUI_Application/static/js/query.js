@@ -40,10 +40,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const first_name = document.getElementById("first-name").value.trim();
         const last_name = document.getElementById("last-name").value.trim();
 
-        // if (!socialMedia || !postTime || !username) {
-        //     alert("Please fill out the required fields.");
-        //     return;
-        // }
+        if (!socialMedia || !postTime || !username) {
+            alert("Please fill out the required fields.");
+            return;
+        }
 
         const params = new URLSearchParams({
             username,
