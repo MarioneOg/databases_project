@@ -87,9 +87,9 @@ def experiment_result():
     return render_template('experiment_result.html')
 
 @app.route('/post-results', methods=['GET'])
-def post_results():
+def post_results(posts):
     query = request.args.to_dict()
-    return render_template('post_results.html', query=query)
+    return render_template('post_results.html', query=query, posts=posts)
 
 @app.route('/results')
 def results():
@@ -1268,6 +1268,14 @@ def search_posts():
         first_name = request.args.get('first_name')
         last_name = request.args.get('last_name')
 
+        query_params = {
+            'username': username,
+            'social_media': media_name,
+            'post_time': post_time,
+            'first_name': first_name,
+            'last_name': last_name
+        }
+
         # Log the incoming parameters to check what's being passed
         print(f"Received parameters - username: {username}, social_media: {media_name}, post_time: {post_time}, first_name: {first_name}, last_name: {last_name}")
 
@@ -1328,11 +1336,14 @@ def search_posts():
             cursor.close()
             conn.close()
 
-            print("Returning posts: ", posts)
-            return jsonify(posts)  # Ensure a valid response is returned here
-        else:
-            print("Error: No database connection")
-            return jsonify({'error': 'Database connection error'}), 500
+            print("THIS IS BEING RETURNED: ", posts)
+            return render_template('post_results.html', query=query_params, posts=posts)
+
+        #     print("Returning posts: ", posts)
+        #     return jsonify(posts)  # Ensure a valid response is returned here
+        # else:
+        #     print("Error: No database connection")
+        #     return jsonify({'error': 'Database connection error'}), 500
 
     except Exception as e:
         import traceback

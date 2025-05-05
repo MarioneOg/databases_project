@@ -30,52 +30,52 @@ buttons.forEach(button => {
   
 
 // Query a post
-document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("submit-post-btn").addEventListener("click", async (event) => {
-        event.preventDefault();  
+// document.addEventListener("DOMContentLoaded", () => {
+//     document.getElementById("submit-post-btn").addEventListener("click", async (event) => {
+//         event.preventDefault();  
 
-        const username = document.getElementById("username").value.trim();
-        const social_media = document.getElementById("social-media").value.trim();
-        const post_time = document.getElementById("post-time").value.trim();
-        const first_name = document.getElementById("first-name").value.trim();
-        const last_name = document.getElementById("last-name").value.trim();
+//         const username = document.getElementById("username").value.trim();
+//         const social_media = document.getElementById("social-media").value.trim();
+//         const post_time = document.getElementById("post-time").value.trim();
+//         const first_name = document.getElementById("first-name").value.trim();
+//         const last_name = document.getElementById("last-name").value.trim();
 
-        if (!social_media || !post_time || !username) {
-            alert("Please fill out the required fields.");
-            return;
-        }
+//         if (!social_media || !post_time || !username) {
+//             alert("Please fill out the required fields.");
+//             return;
+//         }
 
-        const params = new URLSearchParams({
-            username,
-            social_media,
-            post_time,
-            first_name,
-            last_name
-        });
+//         const params = new URLSearchParams({
+//             username,
+//             social_media,
+//             post_time,
+//             first_name,
+//             last_name
+//         });
 
-        try {
-            const response = await fetch(`/search-posts?${params.toString()}`);
+//         try {
+//             const response = await fetch(`/search-posts?${params.toString()}`);
         
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+//             if (!response.ok) {
+//                 throw new Error(`HTTP error! status: ${response.status}`);
+//             }
         
-            const data = await response.json();
-            console.log("Parsed JSON:", data);
+//             const data = await response.json();
+//             console.log("Parsed JSON:", data);
         
-            localStorage.setItem("lastQuery", JSON.stringify({
-                queryType: "post",
-                results: data
-            }));
+//             localStorage.setItem("lastQuery", JSON.stringify({
+//                 queryType: "post",
+//                 results: data
+//             }));
         
-            window.location.href = `/post-results?${params.toString()}`;
-        } catch (err) {
-            console.error("Failed to fetch results:", err);
-            alert("An error occurred while querying the backend.");
-        }
+//             window.location.href = `/post-results?${params.toString()}`;
+//         } catch (err) {
+//             console.error("Failed to fetch results:", err);
+//             alert("An error occurred while querying the backend.");
+//         }
         
-    });
-});
+//     });
+// });
   
 
 // Query an experiment

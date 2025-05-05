@@ -20,15 +20,12 @@
             background-color: #252525;
             border-color: #333;
         }
-        .table {
-            color: #e0e0e0;
-        }
-        .table-striped tbody tr:nth-of-type(odd) {
-            background-color: rgba(255, 255, 255, 0.05);
-        }
         .btn-outline-secondary {
             color: #e0e0e0;
             border-color: #6c757d;
+        }
+        .card-body p {
+            margin-bottom: 0.4rem;
         }
     </style>
 </head>
@@ -71,43 +68,32 @@
             </div>
             <div class="card-body">
                 {% if posts %}
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Social Media</th>
-                                    <th>Username</th>
-                                    <th>Post Time</th>
-                                    <th>Post Text</th>
-                                    <th>Analysis Results</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for post in posts %}
-                                    <tr>
-                                        <td>{{ post.media_name }}</td>
-                                        <td>{{ post.username }}</td>
-                                        <td>{{ post.post_time.strftime('%Y-%m-%d %H:%M') }}</td>
-                                        <td>
-                                            <div style="max-height: 100px; overflow-y: auto;">
-                                                {{ post.post_text|truncate(200) }}
-                                            </div>
-                                        </td>
-                                        <td>
-                                            {% if post.results %}
-                                                <ul class="list-unstyled mb-0">
-                                                    {% for field_name, result in post.results.items() %}
-                                                        <li><strong>{{ field_name }}:</strong> {{ result or 'N/A' }}</li>
-                                                    {% endfor %}
-                                                </ul>
-                                            {% else %}
-                                                <span class="text-muted">No results</span>
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                    <div class="row row-cols-1 g-4">
+                        {% for post in posts %}
+                            <div class="col">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <p><strong>Username:</strong> {{ post.username }}</p>
+                                        <p><strong>Social Media:</strong> {{ post.social_media }}</p>
+                                        <p><strong>Post Time:</strong> {{ post.post_time }}</p>
+                                        <p><strong>Text:</strong></p>
+                                        <div style="max-height: 150px; overflow-y: auto;" class="mb-2">
+                                            {{ post.text|truncate(500) }}
+                                        </div>
+                                        <p><strong>Projects:</strong></p>
+                                        {% if post.projects %}
+                                            <ul class="mb-0">
+                                                {% for project in post.projects %}
+                                                    <li>{{ project }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% else %}
+                                            <p class="text-muted">No projects</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
                     </div>
                 {% else %}
                     <div class="alert alert-info">No posts matched your query.</div>
