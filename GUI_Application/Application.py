@@ -40,6 +40,7 @@ def get_db_connection():
             password="mypassword",
             database="social_media_analysis"
         )
+
         return conn
     except mysql.connector.Error as e:
         print(f"Error connecting to MySQL: {e}")
@@ -53,6 +54,7 @@ def connect_db():
             if conn:
                 cursor = conn.cursor()
                 cursor.execute("SELECT 1")
+                cursor.fetchall() 
                 cursor.close()
                 conn.close()
                 flash("Database connection successful", "success")
@@ -1262,21 +1264,20 @@ def query_posts():
     return redirect(url_for('index'))
 
 from flask import jsonify
-
 @app.route('/search-posts', methods=['GET'])
 def search_posts():
     try:
         username = request.args.get('username')
         media_name = request.args.get('social_media')
-        # post_time = request.args.get('postTime')  # e.g. '2024-05-04T15:30'
         post_time_raw = request.args.get('post_time')
         post_time = None
         if post_time_raw:
             post_time = post_time_raw.replace('T', ' ') + ":00"
         first_name = request.args.get('first_name')
         last_name = request.args.get('last_name')
-        print("\nTHIS IS A PRINT")
-        print(media_name, post_time, username, first_name, last_name)
+
+        # Log the incoming parameters to check what's being passed
+        print(f"Received parameters - username: {username}, social_media: {media_name}, post_time: {post_time}, first_name: {first_name}, last_name: {last_name}")
 
         query = """
             SELECT p.text, sm.name AS social_media, u.username, p.post_time
@@ -1292,13 +1293,8 @@ def search_posts():
             params.append(media_name)
 
         if post_time:
-            try:
-                # MySQL expects 'YYYY-MM-DD HH:MM:SS'
-                # parsed_time = datetime.strptime(post_time, "%Y-%m-%dT%H:%M")
-                query += " AND p.post_time = %s"
-                params.append(post_time)
-            except ValueError:
-                return jsonify({'error': 'Invalid date format for postTime'}), 400
+            query += " AND p.post_time = %s"
+            params.append(post_time)
 
         if username:
             query += " AND u.username = %s"
@@ -1318,47 +1314,40 @@ def search_posts():
             cursor.execute(query, params)
             posts = cursor.fetchall()
 
+            # Log the results
+            print(f"Query results: {posts}")
+
             if not posts:
                 print("POST NOT FOUND")
-                return jsonify([])  # Return empty JSON array if no results
-            print("POST IS FOUND")
-            print(len(posts))
+                return jsonify([])  # Return empty JSON array if no results found
 
+            # Process the posts and include project names
             for post in posts:
-                # cursor.execute("""
-                #     SELECT p.name
-                #     FROM Project p
-                #     JOIN Project_Post pp ON p.name = pp.project_name
-                #     WHERE pp.project_name = %s AND pp.post_username = %s AND pp.post_social_media = %s AND pp.post_time = %s
-                # """, (post['project_name'], post['username'], post['media_name'], post['post_time']))
                 cursor.execute("""
                     SELECT project_name
                     FROM Project_Post
                     WHERE post_username = %s AND post_social_media = %s AND post_time = %s
                 """, (post['username'], post['social_media'], post['post_time']))
                 projects = cursor.fetchall()
-                print("PROJECTS: ", projects)
+                print(f"PROJECTS for {post['username']}: {projects}")
                 post['post_time'] = post['post_time'].strftime('%Y-%m-%d %H:%M:%S')
-                print(type(post['post_time']))
                 post['projects'] = [project['project_name'] for project in projects]
-            
-            print("MADE IT AFTER POST LOOP")
+
             cursor.close()
             conn.close()
-            
-            print("RETURNING NOW: ", posts)
-            try:
-                return jsonify(posts)
-            except Exception as e:
-                print("jsonify error:", e)
-                return jsonify({"error": "failed to serialize"}), 500
-    #     else:
-    #         return jsonify({'error': 'Database connection error'}), 500
+
+            print("Returning posts: ", posts)
+            return jsonify(posts)  # Ensure a valid response is returned here
+        else:
+            print("Error: No database connection")
+            return jsonify({'error': 'Database connection error'}), 500
+
     except Exception as e:
         import traceback
         print("Error in /search-posts route:")
-        traceback.print_exc()
-        return jsonify({'error': str(e)}), 500
+        traceback.print_exc()  # Print the full stack trace for debugging
+        return jsonify({'error': str(e)}), 500  # Ensure a response is returned on error
+
 
 @app.route('/query/project', methods=['GET', 'POST'])
 def query_project():
