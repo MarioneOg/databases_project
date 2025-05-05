@@ -778,88 +778,80 @@ def add_project_post(conn, project_name, username, social_media, post_time):
     conn.commit()
     cursor.close()
 
+from flask import jsonify, request
 
-
-@app.route('/posts/add', methods=['GET', 'POST'])
+@app.route('/posts/add', methods=['POST'])
 def add_post_form():
-    if request.method == 'POST':
-        data = request.get_json()
-        print("JSON: ", data)
-        project_name = data['project_name']
-        user = data['userInfo']
-        original = data['originalPost']
-        repost = data['repost']
+    data = request.get_json()
+    print("JSON: ", data)
 
-        username = user['username']
-        social_media = user['social_media']
-        first_name = user.get('first_name') or None
-        last_name = user.get('last_name') or None
-        country_birth = user.get('country_birth') or None
-        country_residence = user.get('country_residence') or None
-        age = user.get('age') or None
-        gender = user.get('gender') or None
-        verified = user.get('verified') or None
+    project_name = data['project_name']
+    user = data['userInfo']
+    original = data['originalPost']
+    repost = data['repost']
 
-        post_time_raw = original.get('post_time')
-        post_time = post_time_raw.replace('T', ' ') + ":00"
-        text = original.get('post_text') or None
-        likes = original.get('post_likes') or None
-        dislikes = original.get('post_dislikes') or None
-        city = original.get('post_city') or None
-        state = original.get('post_state') or None
-        country = original.get('post_country') or None
-        multimedia = original.get('post_multimedia') or None
+    username = user['username']
+    social_media = user['social_media']
+    first_name = user.get('first_name') or None
+    last_name = user.get('last_name') or None
+    country_birth = user.get('country_birth') or None
+    country_residence = user.get('country_residence') or None
+    age = user.get('age') or None
+    gender = user.get('gender') or None
+    verified = user.get('verified') or None
 
-        repost_username = repost.get('repost_username') or None
-        repost_social_media = repost.get('repost_social_media') or None
-        repost_time_raw = repost.get('repost_time') or None
-        if repost_time_raw:
-            repost_time = post_time_raw.replace('T', ' ') + ":00"
-        repost_city = repost.get('repost_city') or None
-        repost_state = repost.get('repost_state') or None
-        repost_country = repost.get('repost_country') or None
-        repost_likes = repost.get('repost_likes') or None
-        repost_dislikes = repost.get('repost_dislikes') or None
-        repost_multimedia = repost.get('repost_multimedia') or None
+    post_time_raw = original.get('post_time')
+    post_time = post_time_raw.replace('T', ' ') + ":00"
+    text = original.get('post_text') or None
+    likes = original.get('post_likes') or None
+    dislikes = original.get('post_dislikes') or None
+    city = original.get('post_city') or None
+    state = original.get('post_state') or None
+    country = original.get('post_country') or None
+    multimedia = original.get('post_multimedia') or None
 
-        conn = get_db_connection()
-        if conn:
-            cursor = conn.cursor()
-            
-            
-            # Check if project exists
-            cursor.execute("SELECT name FROM Project WHERE name = %s", (project_name,))
-            check_project = cursor.fetchone()
-            
-            if not check_project:
-                flash(f"Project {project_name} not found", "danger")
-                cursor.close()
-                conn.close()
-                return redirect(url_for('entry'))
-            # else:
-            #     institute_id = institute[0]
-            
-            # Add to tables
-            add_social_media(conn, social_media)
-            add_user(conn, username, social_media, first_name, last_name,
-                     country_birth, country_residence, age, gender, verified)
-            add_post(conn, username, social_media, post_time, text, likes, 
-                     dislikes, city, state, country, multimedia)
-            if repost_username and repost_social_media and repost_time:
-                add_repost(conn, repost_username, repost_social_media, repost_time,
-                           repost_city, repost_state, repost_country,
-                           repost_likes, repost_dislikes, repost_multimedia,
-                           username, social_media, post_time)
-            add_project_post(conn, project_name, username, social_media, post_time)
-            
+    repost_username = repost.get('repost_username') or None
+    repost_social_media = repost.get('repost_social_media') or None
+    repost_time_raw = repost.get('repost_time') or None
+    repost_time = None
+    if repost_time_raw:
+        repost_time = repost_time_raw.replace('T', ' ') + ":00"
+    repost_city = repost.get('repost_city') or None
+    repost_state = repost.get('repost_state') or None
+    repost_country = repost.get('repost_country') or None
+    repost_likes = repost.get('repost_likes') or None
+    repost_dislikes = repost.get('repost_dislikes') or None
+    repost_multimedia = repost.get('repost_multimedia') or None
 
+    conn = get_db_connection()
+    if conn:
+        cursor = conn.cursor()
+
+        # Check if project exists
+        cursor.execute("SELECT name FROM Project WHERE name = %s", (project_name,))
+        check_project = cursor.fetchone()
+
+        if not check_project:
             conn.close()
-            
-            flash("Post added successfully", "success")
-            return redirect(url_for('entry'))
-        
-        flash("Database connection error", "danger")
+            return jsonify({"error": f"Project {project_name} not found"}), 400
 
+        # Add to tables
+        add_social_media(conn, social_media)
+        add_user(conn, username, social_media, first_name, last_name,
+                 country_birth, country_residence, age, gender, verified)
+        add_post(conn, username, social_media, post_time, text, likes,
+                 dislikes, city, state, country, multimedia)
+        if repost_username and repost_social_media and repost_time:
+            add_repost(conn, repost_username, repost_social_media, repost_time,
+                       repost_city, repost_state, repost_country,
+                       repost_likes, repost_dislikes, repost_multimedia,
+                       username, social_media, post_time)
+        add_project_post(conn, project_name, username, social_media, post_time)
+
+        conn.close()
+        return jsonify({"message": "Post added successfully"}), 200
+
+    return jsonify({"error": "Database connection error"}), 500
 
 
     # if request.method == 'POST':

@@ -32,6 +32,16 @@ buttons.forEach(button => {
 
 // Add project parameters
 document.getElementById("submit-project").addEventListener("click", () => {
+
+    event.preventDefault(); 
+
+    let startDate = document.getElementById("start-date").value.trim();
+    let endDate = document.getElementById("end-date").value.trim();
+    if(new Date(endDate)< new Date(startDate)){
+        alert("End date cannot be earlier than the start date.");
+        return;
+    }
+
     const projectData = {
         projectName: document.getElementById("project-name").value.trim(),
         managerFirst: document.getElementById("manager-first-name").value.trim(),
