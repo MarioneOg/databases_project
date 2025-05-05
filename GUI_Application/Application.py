@@ -1223,18 +1223,18 @@ def query_posts():
             posts = cursor.fetchall()
             
             # Get projects for each post
-            for post in posts:
-                cursor.execute("""
-                    SELECT p.project_name
-                    FROM projects p
-                    JOIN project_posts pp ON p.project_id = pp.project_id
-                    WHERE pp.post_id = %s
-                """, (post['post_id'],))
-                projects = cursor.fetchall()
-                post['projects'] = [project['project_name'] for project in projects]
+            # for post in posts:
+            #     cursor.execute("""
+            #         SELECT p.project_name
+            #         FROM projects p
+            #         JOIN project_posts pp ON p.project_id = pp.project_id
+            #         WHERE pp.post_id = %s
+            #     """, (post['post_id'],))
+            #     projects = cursor.fetchall()
+            #     post['projects'] = [project['project_name'] for project in projects]
             
-            cursor.close()
-            conn.close()
+            # cursor.close()
+            # conn.close()
             
             return render_template('query_posts_results.html', posts=posts, 
                                   media_name=media_name, start_date=start_date, 
@@ -1260,67 +1260,84 @@ from flask import jsonify
 
 @app.route('/search-posts', methods=['GET'])
 def search_posts():
-    media_name = request.args.get('socialMedia')
-    post_time = request.args.get('postTime')  # e.g. '2024-05-04T15:30'
-    username = request.args.get('username')
-    first_name = request.args.get('firstName')
-    last_name = request.args.get('lastName')
+    try:
+        username = request.args.get('username')
+        media_name = request.args.get('social_media')
+        # post_time = request.args.get('postTime')  # e.g. '2024-05-04T15:30'
+        post_time_raw = request.args.get('post_time')
+        post_time = None
+        if post_time_raw:
+            post_time = post_time_raw.replace('T', ' ') + ":00"
+        first_name = request.args.get('first_name')
+        last_name = request.args.get('last_name')
+        print("\nTHIS IS A PRINT")
+        print(media_name, post_time, username, first_name, last_name)
 
-    query = """
-        SELECT p.post_id, p.post_text, sm.media_name, u.username, p.post_time
-        FROM posts p
-        JOIN users u ON p.user_id = u.user_id
-        JOIN social_media sm ON p.media_id = sm.media_id
-        WHERE 1=1
-    """
-    params = []
+        query = """
+            SELECT p.text, sm.name AS social_media, u.username, p.post_time
+            FROM Post p
+            JOIN User u ON p.post_username = u.username AND p.post_social_media = u.social_media
+            JOIN Social_Media sm ON p.post_social_media = sm.name
+            WHERE 1=1
+        """
+        params = []
 
-    if media_name:
-        query += " AND sm.media_name = %s"
-        params.append(media_name)
+        if media_name:
+            query += " AND sm.name = %s"
+            params.append(media_name)
 
-    if post_time:
-        try:
-            # MySQL expects 'YYYY-MM-DD HH:MM:SS'
-            parsed_time = datetime.strptime(post_time, "%Y-%m-%dT%H:%M")
-            query += " AND p.post_time = %s"
-            params.append(parsed_time.strftime("%Y-%m-%d %H:%M:%S"))
-        except ValueError:
-            return jsonify({'error': 'Invalid date format for postTime'}), 400
+        if post_time:
+            try:
+                # MySQL expects 'YYYY-MM-DD HH:MM:SS'
+                # parsed_time = datetime.strptime(post_time, "%Y-%m-%dT%H:%M")
+                query += " AND p.post_time = %s"
+                params.append(post_time)
+            except ValueError:
+                return jsonify({'error': 'Invalid date format for postTime'}), 400
 
-    if username:
-        query += " AND u.username = %s"
-        params.append(username)
+        if username:
+            query += " AND u.username = %s"
+            params.append(username)
 
-    if first_name:
-        query += " AND u.first_name = %s"
-        params.append(first_name)
+        if first_name:
+            query += " AND u.first_name = %s"
+            params.append(first_name)
 
-    if last_name:
-        query += " AND u.last_name = %s"
-        params.append(last_name)
+        if last_name:
+            query += " AND u.last_name = %s"
+            params.append(last_name)
 
-    conn = get_db_connection()
-    if conn:
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute(query, params)
-        posts = cursor.fetchall()
+        conn = get_db_connection()
+        if conn:
+            cursor = conn.cursor(dictionary=True)
+            cursor.execute(query, params)
+            posts = cursor.fetchall()
 
-        for post in posts:
-            cursor.execute("""
-                SELECT p.project_name
-                FROM projects p
-                JOIN project_posts pp ON p.project_id = pp.project_id
-                WHERE pp.post_id = %s
-            """, (post['post_id'],))
-            projects = cursor.fetchall()
-            post['projects'] = [project['project_name'] for project in projects]
+            for post in posts:
+                # cursor.execute("""
+                #     SELECT p.name
+                #     FROM Project p
+                #     JOIN Project_Post pp ON p.name = pp.project_name
+                #     WHERE pp.project_name = %s AND pp.post_username = %s AND pp.post_social_media = %s AND pp.post_time = %s
+                # """, (post['project_name'], post['username'], post['media_name'], post['post_time']))
+                cursor.execute("""
+                    SELECT project_name
+                    FROM Project_Post
+                    WHERE post_username = %s AND post_social_media = %s AND post_time = %s
+                """, (post['username'], post['social_media'], post['post_time']))
+                projects = cursor.fetchall()
+                post['projects'] = [project['project_name'] for project in projects]
 
-        cursor.close()
-        conn.close()
-        return jsonify(posts)
-
-    return jsonify({'error': 'Database connection error'}), 500
+            cursor.close()
+            conn.close()
+            return jsonify(posts)
+    #     else:
+    #         return jsonify({'error': 'Database connection error'}), 500
+    except Exception as e:
+        import traceback
+        print("Error in /search-posts route:")
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/query/project', methods=['GET', 'POST'])
 def query_project():

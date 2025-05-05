@@ -16,18 +16,17 @@
             <a href="/experiment_query" class="entry-button">Find Experiment</a>
         </div>
 
-        <div id="post-form" class="form-section hidden">
-            <input type="text" id="username" placeholder="* Username" class="form-input" />
-            <input type="text" id="social-media" placeholder="* Social Media" class="form-input" />
-            <input type="datetime-local" id="post-time" name="post_time" class="form-input" />
-            <input type="text" id="first-name" placeholder="First Name" class="form-input" />
-            <input type="text" id="last-name" placeholder="Last Name" class="form-input" />
-            <button id="submit-post-btn" class="submit-btn">Search</button>
-
-        </div>
+        <form id="post-form" class="form-section hidden">
+            <input type="text" id="username" name="username"placeholder="* Username" class="form-input" required />
+            <input type="text" id="social-media" name="social_media" placeholder="* Social Media" class="form-input" required />
+            <input type="datetime-local" id="post-time" name="post_time" class="form-input" required />
+            <input type="text" id="first-name" name="first_name" placeholder="First Name" class="form-input" />
+            <input type="text" id="last-name" name="last_name" placeholder="Last Name" class="form-input" />
+            <button id="submit-post-btn" class="submit-btn" type="button">Search</button>
+        </form>
 
         <div id="experiment-form" class="form-section hidden">
-            <input type="text" id="experiment-name" placeholder="* Experiment Name" class="form-input" />
+            <input type="text" id="experiment-name" name="project_name" placeholder="* Experiment Name" class="form-input" required />
             <button id="submit-exp-btn" class="submit-btn">Search</button>
 
         </div>
@@ -43,7 +42,7 @@
         <a href="{{ url_for('results') }}"class="nav-button">Results</a>
     </nav>
 
-    <script src="{{ url_for('static', filename='js/query.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/query.js') }}" defer></script>
 
 </body>
 </html>

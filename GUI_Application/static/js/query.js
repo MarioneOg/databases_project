@@ -1,3 +1,6 @@
+console.log("query.js is running");
+
+
 const buttons = document.querySelectorAll('.entry-button');
 
 const postForm = document.getElementById('post-form');
@@ -27,41 +30,48 @@ buttons.forEach(button => {
   
 
 // Query a post
-document.getElementById("submit-post-btn").addEventListener("click", async (event) => {
-    const socialMedia = document.getElementById("social-media").value.trim();
-    const postTime = document.getElementById("post-time").value.trim();
-    const username = document.getElementById("username").value.trim();
-    const firstName = document.getElementById("first-name").value.trim();
-    const lastName = document.getElementById("last-name").value.trim();
-  
-    if (!socialMedia && !postTime && !username && !firstName && !lastName) {
-        event.preventDefault();  // Prevent form submission
-        alert("Please fill out at least one field.");
-        return;
-    }
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("submit-post-btn").addEventListener("click", async (event) => {
+        event.preventDefault();  
 
-    const params = new URLSearchParams({
-        socialMedia,
-        postTime,
-        username,
-        firstName,
-        lastName
+        const username = document.getElementById("username").value.trim();
+        const social_media = document.getElementById("social-media").value.trim();
+        const post_time = document.getElementById("post-time").value.trim();
+        const first_name = document.getElementById("first-name").value.trim();
+        const last_name = document.getElementById("last-name").value.trim();
+
+        // if (!socialMedia || !postTime || !username) {
+        //     alert("Please fill out the required fields.");
+        //     return;
+        // }
+
+        const params = new URLSearchParams({
+            username,
+            social_media,
+            post_time,
+            first_name,
+            last_name
+        });
+
+        try {
+            const response = await fetch(`/search-posts?${params.toString()}`);
+            const text = await response.text(); 
+            console.log("Raw response text:", text);
+
+            const data = await response.json();
+            console.log("Parsed JSON:", data);
+
+            localStorage.setItem("lastQuery", JSON.stringify({
+                queryType: "post",
+                results: data
+            }));
+
+            window.location.href = `/post-results?${params.toString()}`;
+        } catch (err) {
+            console.error("Failed to fetch results:", err);
+            alert("An error occurred while querying the backend.");
+        }
     });
-  
-    try {
-        const response = await fetch(`/search-posts?${params.toString()}`);
-        const data = await response.json();
-  
-        localStorage.setItem("lastQuery", JSON.stringify({
-            queryType: "post",
-            results: data
-        }));
-  
-        window.location.href = `/post-results?${params.toString()}`;
-    } catch (err) {
-        console.error("Failed to fetch results:", err);
-        alert("An error occurred while querying the backend.");
-    }
 });
   
 
