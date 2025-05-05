@@ -77,8 +77,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Query an experiment
 document.getElementById("submit-exp-btn").addEventListener("click", async (event) => {
-    const experimentName = document.getElementById("experiment-name").value.trim();
+    event.preventDefault();  
 
+    const experimentName = document.getElementById("experiment-name").value.trim();
 
     const params = new URLSearchParams({
         experiment_name: experimentName
