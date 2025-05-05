@@ -156,6 +156,17 @@ def list_projects():
     flash("Database connection error", "danger")
     return redirect(url_for('index'))
 
+def check_institute(conn, institute_name):
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT name FROM Institute WHERE name = %s", (institute_name,))
+    result = cursor.fetchone()
+
+    if not result:
+        cursor.execute("INSERT INTO Institute (name) VALUES (%s)", (institute_name,))
+        conn.commit()
+    cursor.close()
+
 @app.route('/projects/add', methods=['GET', 'POST'])
 def add_project_form():
     if request.method == 'POST':
@@ -165,6 +176,10 @@ def add_project_form():
         institute_name = request.form['institute_name'] or None
         start_date = request.form['start_date'] or None
         end_date = request.form['end_date'] or None
+
+        if start_date and end_date and start_date > end_date:
+            flash("Start date cannot be after end date", "danger")
+            return redirect(url_for('entry'))
         
         conn = get_db_connection()
         if conn:
@@ -172,15 +187,7 @@ def add_project_form():
             
             # Check if institute exists
             if institute_name:
-                cursor.execute("SELECT name FROM Institute WHERE name = %s", (institute_name,))
-                institute = cursor.fetchone()
-            
-                if not institute:
-                    # Create institute
-                    cursor.execute("INSERT INTO Institute (name) VALUES (%s)", (institute_name,))
-                    # institute_id = cursor.lastrowid
-                else:
-                    cursor.execute("UPDATE Institute SET name = (%s)", (institute_name,))
+                check_institute(conn, institute_name)
             # else:
             #     institute_id = institute[0]
             
@@ -200,14 +207,45 @@ def add_project_form():
                 institute_name, start_date, end_date))
                 conn.commit()
             else:
-                cursor.execute("""
-                    UPDATE Project 
-                    SET manager_firstname = (%s), manager_lastname = (%s), 
-                               institute_name = (%s), start_date = (%s), end_date = (%s)
-                    WHERE name = %s
-                """, (manager_first_name, manager_last_name, 
-                institute_name, start_date, end_date, project_name))
-                conn.commit()
+                # Update only provided fields
+                update_fields = []
+                update_values = []
+
+                if manager_first_name:
+                    update_fields.append("manager_firstname = %s")
+                    update_values.append(manager_first_name)
+
+                if manager_last_name:
+                    update_fields.append("manager_lastname = %s")
+                    update_values.append(manager_last_name)
+
+                if institute_name:
+                    check_institute(conn, institute_name)
+                    update_fields.append("institute_name = %s")
+                    update_values.append(institute_name)
+
+                if start_date:
+                    update_fields.append("start_date = %s")
+                    update_values.append(start_date)
+
+                if end_date:
+                    update_fields.append("end_date = %s")
+                    update_values.append(end_date)
+
+                if update_fields:
+                    update_query = f"""
+                        UPDATE Project 
+                        SET {', '.join(update_fields)}
+                        WHERE name = %s
+                    """
+                    update_values.append(project_name)
+                    cursor.execute(update_query, tuple(update_values))
+                    conn.commit()
+                else:
+                    flash("Post already exists", "danger")
+                    cursor.close()
+                    conn.close()
+                    return redirect(url_for('entry'))
             # project_id = cursor.lastrowid
             
             # Handle project fields
@@ -280,6 +318,18 @@ def add_analysis(conn, project_name, username, social_media, post_time, field_na
             VALUES (%s, %s, %s, %s, %s, %s)
         """, (project_name, username, social_media, post_time, field_name, analysis))
         conn.commit()
+    elif analysis:
+        # Update existing analysis
+        cursor.execute("""
+            UPDATE Analysis_Result
+            SET analysis = %s
+            WHERE project_name = %s AND post_username = %s AND post_social_media = %s AND post_time = %s AND field_name = %s
+        """, (analysis, project_name, username, social_media, post_time, field_name))
+        conn.commit()
+    else:
+        flash("Analysis already exists", "danger")
+        cursor.close()
+        return redirect(url_for('entry'))
 
     cursor.close()
 
@@ -334,9 +384,10 @@ def add_analysis_form():
     if request.method == 'POST':
         project_name = request.form['project_name']
         username = request.form['username']
-        social_media = request.form['social_media'] 
-        post_time = request.form['post_time'] 
-        field_name = request.form['field_name'] 
+        social_media = request.form['social_media'].lower() 
+        post_time_raw = request.form['post_time'] 
+        post_time = post_time_raw.replace('T', ' ') + ":00"
+        field_name = request.form['field_name'].lower()
         analysis = request.form['analysis'] or None
 
         conn = get_db_connection()
@@ -563,6 +614,17 @@ def add_social_media(conn, social_media):
 
     cursor.close()
 
+# def check_social_media(conn, social_media):
+#     cursor = conn.cursor()
+
+#     cursor.execute("SELECT name FROM Social_Media WHERE name = %s", (social_media,))
+#     result = cursor.fetchone()
+
+#     if not result:
+#         cursor.execute("INSERT INTO Social_Media (name) VALUES (%s)", (social_media,))
+#         conn.commit()
+#     cursor.close()
+
 # Helper functions for Add Post Data Entry
 def add_user(conn, username, social_media, first_name, last_name, country_birth, country_residence, age, gender, verified):
     cursor = conn.cursor()
@@ -583,37 +645,41 @@ def add_user(conn, username, social_media, first_name, last_name, country_birth,
         """, (username, social_media, first_name, last_name, country_birth,
               country_residence, age, gender, verified))
         conn.commit()
-    # else:
-    #     update_fields = []
-    #     update_values = []
+    else:
+        update_fields = []
+        update_values = []
 
-    #     if first_name:
-    #         update_fields.append("first_name = %s")
-    #         update_values.append(first_name)
-    #     if last_name:
-    #         update_fields.append("last_name = %s")
-    #         update_values.append(last_name)
-    #     if country_birth:
-    #         update_fields.append("country_of_birth = %s")
-    #         update_values.append(country_birth)
-    #     if country_residence:
-    #         update_fields.append("country_of_residence = %s")
-    #         update_values.append(country_residence)
-    #     if age:
-    #         update_fields.append("age = %s")
-    #         update_values.append(age)
-    #     if verified is not None:
-    #         update_fields.append("is_verified = %s")
-    #         update_values.append(verified)
+        if first_name:
+            update_fields.append("first_name = %s")
+            update_values.append(first_name)
+        if last_name:
+            update_fields.append("last_name = %s")
+            update_values.append(last_name)
+        if country_birth:
+            update_fields.append("country_of_birth = %s")
+            update_values.append(country_birth)
+        if country_residence:
+            update_fields.append("country_of_residence = %s")
+            update_values.append(country_residence)
+        if age:
+            update_fields.append("age = %s")
+            update_values.append(age)
+        if verified is not None:
+            update_fields.append("is_verified = %s")
+            update_values.append(verified)
 
-    #     if update_fields:
-    #         update_query = f"""
-    #             UPDATE User
-    #             SET {', '.join(update_fields)}
-    #             WHERE username = %s AND social_media = %s
-    #         """
-    #         update_values.extend([username, social_media])
-    #         cursor.execute(update_query, tuple(update_values))
+        if update_fields:
+            update_query = f"""
+                UPDATE User
+                SET {', '.join(update_fields)}
+                WHERE username = %s AND social_media = %s
+            """
+            update_values.extend([username, social_media])
+            cursor.execute(update_query, tuple(update_values))
+        else:
+            flash("User already exists", "danger")
+            cursor.close()
+            return redirect(url_for('entry'))
         
     conn.commit()
     cursor.close()
@@ -648,6 +714,45 @@ def add_post(conn, username, social_media, post_time, text, likes, dislikes, cit
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """, (username, social_media, post_time, text, likes, dislikes, city, state, country, multimedia))
         conn.commit()
+    else:
+        update_fields = []
+        update_values = []
+
+        if text is not None:
+            update_fields.append("text = %s")
+            update_values.append(text)
+        if likes is not None:
+            update_fields.append("likes = %s")
+            update_values.append(likes)
+        if dislikes is not None:
+            update_fields.append("dislikes = %s")
+            update_values.append(dislikes)
+        if city is not None:
+            update_fields.append("location_city = %s")
+            update_values.append(city)
+        if state is not None:
+            update_fields.append("location_state = %s")
+            update_values.append(state)
+        if country is not None:
+            update_fields.append("location_country = %s")
+            update_values.append(country)
+        if multimedia is not None:
+            update_fields.append("has_multimedia = %s")
+            update_values.append(multimedia)
+        
+        if update_fields:
+            update_query = f"""
+                UPDATE Post
+                SET {', '.join(update_fields)}
+                WHERE post_username = %s AND post_social_media = %s AND post_time = %s
+            """
+            update_values.extend([username, social_media, post_time])
+            cursor.execute(update_query, tuple(update_values))
+            conn.commit()
+        else:
+            flash("Post already exists", "danger")
+            cursor.close()
+            return redirect(url_for('entry'))
 
     cursor.close()
 
@@ -708,45 +813,78 @@ def add_repost(conn,
     """, (repost_username, repost_social_media, repost_time))
     check_repost = cursor.fetchone()
 
-    if check_repost:
-        flash(f"Repost already exists", "danger")
-        cursor.close()
-        conn.close()
-        return redirect(url_for('entry'))
-    print("Finished repost exists")
-
-    # Insert repost
-    print("Inserting now")
-    cursor.execute("""
-        INSERT INTO Repost (
-            original_post_username, original_social_media, original_post_time,
+    if not check_repost:
+        # Insert repost
+        cursor.execute("""
+            INSERT INTO Repost (
+                original_post_username, original_social_media, original_post_time,
+                repost_username, repost_social_media, repost_time,
+                repost_location_city, repost_location_state, repost_location_country,
+                repost_likes, repost_dislikes, repost_has_multimedia
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (
+            original_username, original_social_media, original_post_time,
             repost_username, repost_social_media, repost_time,
-            repost_location_city, repost_location_state, repost_location_country,
-            repost_likes, repost_dislikes, repost_has_multimedia
-        )
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-    """, (
-        original_username, original_social_media, original_post_time,
-        repost_username, repost_social_media, repost_time,
-        repost_city, repost_state, repost_country,
-        repost_likes, repost_dislikes, repost_multimedia
-    ))
+            repost_city, repost_state, repost_country,
+            repost_likes, repost_dislikes, repost_multimedia
+        ))
+        conn.commit()
 
-    # Add to post as well
-    cursor.execute("""
-        INSERT INTO Post (
-            post_username, post_social_media, post_time,
-            likes, dislikes, location_city, location_state, location_country,
-            has_multimedia
-        )
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-    """, (
-        repost_username, repost_social_media, repost_time,
-        repost_likes, repost_dislikes, repost_city, repost_state, repost_country,
-        repost_multimedia
-    ))
+        # Add to post as well
+        cursor.execute("""
+            INSERT INTO Post (
+                post_username, post_social_media, post_time,
+                likes, dislikes, location_city, location_state, location_country,
+                has_multimedia
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (
+            repost_username, repost_social_media, repost_time,
+            repost_likes, repost_dislikes, repost_city, repost_state, repost_country,
+            repost_multimedia
+        ))
+        conn.commit()
+    else:
+        # Update repost
+        update_fields = []
+        update_values = []
 
-    conn.commit()
+        if repost_city is not None:
+            update_fields.append("repost_location_city = %s")
+            update_values.append(repost_city)
+        if repost_state is not None:
+            update_fields.append("repost_location_state = %s")
+            update_values.append(repost_state)
+        if repost_country is not None:
+            update_fields.append("repost_location_country = %s")
+            update_values.append(repost_country)
+        if repost_likes is not None:
+            update_fields.append("repost_likes = %s")
+            update_values.append(repost_likes)
+        if repost_dislikes is not None:
+            update_fields.append("repost_dislikes = %s")
+            update_values.append(repost_dislikes)
+        if repost_multimedia is not None:
+            update_fields.append("repost_has_multimedia = %s")
+            update_values.append(repost_multimedia)
+
+        if update_fields:
+            update_query = f"""
+                UPDATE Repost
+                SET {', '.join(update_fields)}
+                WHERE repost_username = %s AND repost_social_media = %s AND repost_time = %s
+            """
+            update_values.extend([repost_username, repost_social_media, repost_time])
+            cursor.execute(update_query, tuple(update_values))
+            conn.commit()
+
+            add_post(conn, repost_username, repost_social_media, repost_time, None, repost_likes, repost_dislikes,
+                     repost_city, repost_state, repost_country, repost_multimedia)
+        else:
+            flash("Repost already exists", "danger")
+            return redirect(url_for('entry'))
+
     print("Finished insert")
     cursor.close()
 
@@ -788,36 +926,46 @@ def add_post_form():
     repost = data['repost']
 
     username = user['username']
-    social_media = user['social_media']
+    social_media = user['social_media'].lower()
     first_name = user.get('first_name') or None
     last_name = user.get('last_name') or None
-    country_birth = user.get('country_birth') or None
-    country_residence = user.get('country_residence') or None
+    country_birth = user.get('country_birth').lower() or None
+    country_residence = user.get('country_residence').lower() or None
     age = user.get('age') or None
-    gender = user.get('gender') or None
+    if age and age < 0:
+        flash("Age cannot be negative", "danger")
+    gender = user.get('gender').lower() or None
     verified = user.get('verified') or None
 
     post_time_raw = original.get('post_time')
     post_time = post_time_raw.replace('T', ' ') + ":00"
     text = original.get('post_text') or None
     likes = original.get('post_likes') or None
+    if likes and likes < 0:
+        flash("Likes cannot be negative", "danger")
     dislikes = original.get('post_dislikes') or None
-    city = original.get('post_city') or None
-    state = original.get('post_state') or None
-    country = original.get('post_country') or None
+    if dislikes and dislikes < 0:
+        flash("Dislikes cannot be negative", "danger")
+    city = original.get('post_city').lower() or None
+    state = original.get('post_state').lower() or None
+    country = original.get('post_country').lower() or None
     multimedia = original.get('post_multimedia') or None
 
     repost_username = repost.get('repost_username') or None
-    repost_social_media = repost.get('repost_social_media') or None
+    repost_social_media = repost.get('repost_social_media').lower() or None
     repost_time_raw = repost.get('repost_time') or None
     repost_time = None
     if repost_time_raw:
         repost_time = repost_time_raw.replace('T', ' ') + ":00"
-    repost_city = repost.get('repost_city') or None
-    repost_state = repost.get('repost_state') or None
-    repost_country = repost.get('repost_country') or None
+    repost_city = repost.get('repost_city').lower() or None
+    repost_state = repost.get('repost_state').lower() or None
+    repost_country = repost.get('repost_country').lower() or None
     repost_likes = repost.get('repost_likes') or None
+    if repost_likes and repost_likes < 0:
+        flash("Repost likes cannot be negative", "danger")
     repost_dislikes = repost.get('repost_dislikes') or None
+    if repost_dislikes and repost_dislikes < 0:
+        flash("Repost dislikes cannot be negative", "danger")
     repost_multimedia = repost.get('repost_multimedia') or None
 
     conn = get_db_connection()
