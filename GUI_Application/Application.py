@@ -781,39 +781,44 @@ def add_project_post(conn, project_name, username, social_media, post_time):
 @app.route('/posts/add', methods=['GET', 'POST'])
 def add_post_form():
     if request.method == 'POST':
-        project_name = request.form['project_name']
+        data = request.get_json()
+        print("JSON: ", data)
+        project_name = data['project_name']
+        user = data['userInfo']
+        original = data['originalPost']
+        repost = data['repost']
 
-        username = request.form['username']
-        social_media = request.form['social_media']
-        first_name = request.form['first_name'] or None
-        last_name = request.form['last_name'] or None
-        country_birth = request.form['country_birth'] or None
-        country_residence = request.form['country_residence'] or None
-        age = request.form['age'] or None
-        gender = request.form['gender'] or None
-        verified = request.form['verified'] or None
+        username = user['username']
+        social_media = user['social_media']
+        first_name = user.get('first_name') or None
+        last_name = user.get('last_name') or None
+        country_birth = user.get('country_birth') or None
+        country_residence = user.get('country_residence') or None
+        age = user.get('age') or None
+        gender = user.get('gender') or None
+        verified = user.get('verified') or None
 
-        post_time_raw = request.form['post_time']
+        post_time_raw = original.get('post_time')
         post_time = post_time_raw.replace('T', ' ') + ":00"
-        text = request.form['text'] or None
-        likes = request.form['likes'] or None
-        dislikes = request.form['dislikes'] or None
-        city = request.form['city'] or None
-        state = request.form['state'] or None
-        country = request.form['country'] or None
-        multimedia = request.form['multimedia'] or None
+        text = original.get('post_text') or None
+        likes = original.get('post_likes') or None
+        dislikes = original.get('post_dislikes') or None
+        city = original.get('post_city') or None
+        state = original.get('post_state') or None
+        country = original.get('post_country') or None
+        multimedia = original.get('post_multimedia') or None
 
-        repost_username = request.form['repost_username'] or None
-        repost_social_media = request.form['repost_social_media'] or None
-        repost_time_raw = request.form['repost_time'] or None
+        repost_username = repost.get('repost_username') or None
+        repost_social_media = repost.get('repost_social_media') or None
+        repost_time_raw = repost.get('repost_time') or None
         if repost_time_raw:
             repost_time = post_time_raw.replace('T', ' ') + ":00"
-        repost_city = request.form['repost_city'] or None
-        repost_state = request.form['repost_state'] or None
-        repost_country = request.form['repost_country'] or None
-        repost_likes = request.form['repost_likes'] or None
-        repost_dislikes = request.form['repost_dislikes'] or None
-        repost_multimedia = request.form['repost_multimedia'] or None
+        repost_city = repost.get('repost_city') or None
+        repost_state = repost.get('repost_state') or None
+        repost_country = repost.get('repost_country') or None
+        repost_likes = repost.get('repost_likes') or None
+        repost_dislikes = repost.get('repost_dislikes') or None
+        repost_multimedia = repost.get('repost_multimedia') or None
 
         conn = get_db_connection()
         if conn:

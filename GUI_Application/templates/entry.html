@@ -33,7 +33,7 @@
 
         <form id="post-form" class="form-section hidden" method="POST" action="{{ url_for('add_post_form') }}">
             <h3 class="form-subheader">Project</h3>
-            <input type="text" id="project-name" name="project_name" placeholder="* Project Name" class="form-input" required />
+            <input type="text" id="post-project-name" name="project_name" placeholder="* Project Name" class="form-input" required />
           
             <h3 class="form-subheader">User Info</h3>
             <input type="text" id="username" name="username" placeholder="* Username" class="form-input" required/>
@@ -76,18 +76,18 @@
             <input type="text" id="repost-likes" name="repost_likes" placeholder="Repost Likes" class="form-input" />
             <input type="text" id="repost-dislikes" name="repost_dislikes" placeholder="Repost Dislikes" class="form-input" />
             <label for="repost_multimedia">Multimedia:</label>
-            <select id="repost_multimedia" name="repost_multimedia" class="form-input">
+            <select id="repost-multimedia" name="repost_multimedia" class="form-input">
                 <option value="">-Select-</option>
                 <option value="1">Yes</option>
                 <option value="0">No</option>
             </select>
 
-            <button id="submit-post" class="submit-btn">Add</button>
+            <button id="submit-post" class="submit-btn" type="button">Add</button>
 
         </form>
 
         <form id="analysis-form" class="form-section hidden" method="POST" action="{{ url_for('add_analysis_form') }}">
-            <input type="text" id="project-name" name="project_name" placeholder="* Project Name" class="form-input" required/>
+            <input type="text" id="analysis-project-name" name="project_name" placeholder="* Project Name" class="form-input" required/>
             <input type="text" id="username" name="username" placeholder="* Post Username" class="form-input" required/>
             <input type="text" id="social-media" name="social_media" placeholder="* Post Social Media" class="form-input" required />
             <input type="datetime-local" id="post-time" name="post_time" class="form-input" required />
@@ -117,7 +117,7 @@
         <a href="{{ url_for('results') }}" class="nav-button">Results</a>
     </nav>
 
-    <script src="{{ url_for('static', filename='js/entry.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/entry.js') }}?v=7" defer></script>
 
 </body>
 </html>
