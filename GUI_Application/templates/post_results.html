@@ -73,12 +73,12 @@
                             <div class="col">
                                 <div class="card">
                                     <div class="card-body">
-                                        <p><strong>Username:</strong> {{ post.username }}</p>
-                                        <p><strong>Social Media:</strong> {{ post.social_media }}</p>
-                                        <p><strong>Post Time:</strong> {{ post.post_time }}</p>
+                                        <p><strong>Username:</strong> {{ post.username|default('(No username)', true) }}</p>
+                                        <p><strong>Social Media:</strong> {{ post.social_media|default('(No social media)', true) }}</p>
+                                        <p><strong>Post Time:</strong> {{ post.post_time|default('(No time)', true) }}</p>
                                         <p><strong>Text:</strong></p>
                                         <div style="max-height: 150px; overflow-y: auto;" class="mb-2">
-                                            {{ post.text|truncate(500) }}
+                                            {{ post.text|default('(No text)', true)|truncate(500) }}
                                         </div>
                                         <p><strong>Projects:</strong></p>
                                         {% if post.projects %}

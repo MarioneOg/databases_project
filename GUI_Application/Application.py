@@ -560,9 +560,6 @@ def add_social_media(conn, social_media):
         # Insert it if it's not already in the table
         cursor.execute("INSERT INTO Social_Media (name) VALUES (%s)", (social_media,))
         conn.commit()
-    else:
-        cursor.execute("UPDATE Social_Media SET name = (%s)", (social_media,))
-        conn.commit()
 
     cursor.close()
 
@@ -586,37 +583,37 @@ def add_user(conn, username, social_media, first_name, last_name, country_birth,
         """, (username, social_media, first_name, last_name, country_birth,
               country_residence, age, gender, verified))
         conn.commit()
-    else:
-        update_fields = []
-        update_values = []
+    # else:
+    #     update_fields = []
+    #     update_values = []
 
-        if first_name:
-            update_fields.append("first_name = %s")
-            update_values.append(first_name)
-        if last_name:
-            update_fields.append("last_name = %s")
-            update_values.append(last_name)
-        if country_birth:
-            update_fields.append("country_of_birth = %s")
-            update_values.append(country_birth)
-        if country_residence:
-            update_fields.append("country_of_residence = %s")
-            update_values.append(country_residence)
-        if age:
-            update_fields.append("age = %s")
-            update_values.append(age)
-        if verified is not None:
-            update_fields.append("is_verified = %s")
-            update_values.append(verified)
+    #     if first_name:
+    #         update_fields.append("first_name = %s")
+    #         update_values.append(first_name)
+    #     if last_name:
+    #         update_fields.append("last_name = %s")
+    #         update_values.append(last_name)
+    #     if country_birth:
+    #         update_fields.append("country_of_birth = %s")
+    #         update_values.append(country_birth)
+    #     if country_residence:
+    #         update_fields.append("country_of_residence = %s")
+    #         update_values.append(country_residence)
+    #     if age:
+    #         update_fields.append("age = %s")
+    #         update_values.append(age)
+    #     if verified is not None:
+    #         update_fields.append("is_verified = %s")
+    #         update_values.append(verified)
 
-        if update_fields:
-            update_query = f"""
-                UPDATE User
-                SET {', '.join(update_fields)}
-                WHERE username = %s AND social_media = %s
-            """
-            update_values.extend([username, social_media])
-            cursor.execute(update_query, tuple(update_values))
+    #     if update_fields:
+    #         update_query = f"""
+    #             UPDATE User
+    #             SET {', '.join(update_fields)}
+    #             WHERE username = %s AND social_media = %s
+    #         """
+    #         update_values.extend([username, social_media])
+    #         cursor.execute(update_query, tuple(update_values))
         
     conn.commit()
     cursor.close()
@@ -1260,7 +1257,7 @@ from flask import jsonify
 def search_posts():
     try:
         username = request.args.get('username')
-        media_name = request.args.get('social_media')
+        media_name = request.args.get('social_media').lower()
         post_time_raw = request.args.get('post_time')
         post_time = None
         if post_time_raw:

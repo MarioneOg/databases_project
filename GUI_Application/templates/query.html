@@ -17,9 +17,9 @@
         </div>
 
         <form id="post-form" class="form-section hidden" action="{{ url_for('search_posts') }}" method="get">
-            <input type="text" id="username" name="username"placeholder="* Username" class="form-input" required />
-            <input type="text" id="social-media" name="social_media" placeholder="* Social Media" class="form-input" required />
-            <input type="datetime-local" id="post-time" name="post_time" class="form-input" required />
+            <input type="text" id="username" name="username"placeholder="Username" class="form-input" />
+            <input type="text" id="social-media" name="social_media" placeholder="Social Media" class="form-input" />
+            <input type="datetime-local" id="post-time" name="post_time" class="form-input" />
             <input type="text" id="first-name" name="first_name" placeholder="First Name" class="form-input" />
             <input type="text" id="last-name" name="last_name" placeholder="Last Name" class="form-input" />
             <button id="submit-post-btn" class="submit-btn">Search</button>
