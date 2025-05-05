@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ project.project_name }} - Social Media Analysis System</title>
+    <title>{{ project.name }} - Social Media Analysis System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -20,12 +20,6 @@
             background-color: #252525;
             border-color: #333;
         }
-        .table {
-            color: #e0e0e0;
-        }
-        .table-striped tbody tr:nth-of-type(odd) {
-            background-color: rgba(255, 255, 255, 0.05);
-        }
         .btn-outline-secondary {
             color: #e0e0e0;
             border-color: #6c757d;
@@ -33,8 +27,11 @@
         .progress {
             background-color: #333;
         }
+        .card-body p {
+            margin-bottom: 0.4rem;
+        }
         
-        /* 추가: 다양한 너비의 진행 표시줄 클래스 */
+        /* 진행 표시줄 클래스 */
         .w-0 { width: 0%; }
         .w-10 { width: 10%; }
         .w-20 { width: 20%; }
@@ -50,11 +47,12 @@
 </head>
 
 <body>
+    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary m-2">Home</a>
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <a href="{{ url_for('experiment_query') }}" class="btn btn-outline-secondary">Back to Query</a>
             <h1>Experiment Details</h1>
-            <div></div> <!-- Empty div for flex spacing -->
+            <div></div> <!-- 균형을 위한 빈 div -->
         </div>
         
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -65,6 +63,7 @@
             {% endif %}
         {% endwith %}
         
+        <!-- 프로젝트 정보 카드 -->
         <div class="card">
             <div class="card-header">
                 <h3>{{ project.name }}</h3>
@@ -83,6 +82,7 @@
             </div>
         </div>
         
+        <!-- 필드 완성도 통계 카드 -->
         <div class="card">
             <div class="card-header">
                 <h4>Field Completion Statistics</h4>
@@ -101,7 +101,7 @@
                                     {% set percentage_value = percentage_text|replace('%', '')|float %}
                                     {% set rounded_percentage = ((percentage_value / 10)|round * 10)|int %}
                                     
-                                    <!-- 진행 표시줄 - 인라인 스타일 대신 클래스 사용 -->
+                                    <!-- 진행 표시줄 -->
                                     <div class="progress">
                                         <div class="progress-bar w-{{ rounded_percentage }}" 
                                              role="progressbar"
@@ -119,49 +119,68 @@
             </div>
         </div>
         
+        <!-- 관련 포스트 카드 - post_results.html 스타일로 변경 -->
         <div class="card">
             <div class="card-header">
                 <h4>Associated Posts ({{ posts|length }})</h4>
             </div>
             <div class="card-body">
                 {% if posts %}
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Social Media</th>
-                                    <th>Username</th>
-                                    <th>Post Time</th>
-                                    <th>Post Text</th>
-                                    <th>Analysis Results</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for post in posts %}
-                                    <tr>
-                                        <td>{{ post.post_social_media }}</td>
-                                        <td>{{ post.post_username }}</td>
-                                        <td>{{ post.post_time }}</td>
-                                        <td>
-                                            <div style="max-height: 100px; overflow-y: auto;">
-                                                {{ post.text|truncate(200) }}
+                    <div class="row row-cols-1 g-4">
+                        {% for post in posts %}
+                            <div class="col">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <p><strong>Username:</strong> {{ post.post_username|default('(No username)', true) }}</p>
+                                                <p><strong>Social Media:</strong> {{ post.post_social_media|default('(No social media)', true) }}</p>
+                                                <p><strong>Post Time:</strong> {{ post.post_time|default('(No time)', true) }}</p>
+                                                {% if post.likes is defined and post.likes %}
+                                                    <p><strong>Likes:</strong> {{ post.likes }}</p>
+                                                {% endif %}
+                                                {% if post.dislikes is defined and post.dislikes %}
+                                                    <p><strong>Dislikes:</strong> {{ post.dislikes }}</p>
+                                                {% endif %}
+                                                {% if post.location_city is defined and post.location_city %}
+                                                    <p><strong>Location:</strong> 
+                                                        {{ post.location_city }}
+                                                        {% if post.location_state %}, {{ post.location_state }}{% endif %}
+                                                        {% if post.location_country %}, {{ post.location_country }}{% endif %}
+                                                    </p>
+                                                {% endif %}
                                             </div>
-                                        </td>
-                                        <td>
-                                            {% if post.results %}
-                                                <ul class="list-unstyled mb-0">
-                                                    {% for field_name, result in post.results.items() %}
-                                                        <li><strong>{{ field_name }}:</strong> {{ result or 'N/A' }}</li>
-                                                    {% endfor %}
-                                                </ul>
-                                            {% else %}
-                                                <span class="text-muted">No results yet</span>
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                                            
+                                            <div class="col-md-8">
+                                                <p><strong>Text:</strong></p>
+                                                <div style="max-height: 150px; overflow-y: auto;" class="mb-3 p-2 bg-dark">
+                                                    {{ post.text|default('(No text)', true)|truncate(500) }}
+                                                </div>
+                                                
+                                                {% if post.results %}
+                                                    <div class="card bg-dark mb-2">
+                                                        <div class="card-header">
+                                                            <h5 class="mb-0">Analysis Results</h5>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <ul class="list-group list-group-flush bg-transparent">
+                                                                {% for field_name, result in post.results.items() %}
+                                                                    <li class="list-group-item bg-dark text-light border-secondary">
+                                                                        <strong>{{ field_name }}:</strong> {{ result or 'N/A' }}
+                                                                    </li>
+                                                                {% endfor %}
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="alert alert-secondary">No analysis results yet</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
                     </div>
                 {% else %}
                     <div class="alert alert-info">No posts associated with this experiment yet.</div>
