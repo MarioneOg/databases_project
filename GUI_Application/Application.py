@@ -1313,6 +1313,12 @@ def search_posts():
             cursor.execute(query, params)
             posts = cursor.fetchall()
 
+            if not posts:
+                print("POST NOT FOUND")
+                return jsonify([])  # Return empty JSON array if no results
+            print("POST IS FOUND")
+            print(len(posts))
+
             for post in posts:
                 # cursor.execute("""
                 #     SELECT p.name
@@ -1326,11 +1332,21 @@ def search_posts():
                     WHERE post_username = %s AND post_social_media = %s AND post_time = %s
                 """, (post['username'], post['social_media'], post['post_time']))
                 projects = cursor.fetchall()
+                print("PROJECTS: ", projects)
+                post['post_time'] = post['post_time'].strftime('%Y-%m-%d %H:%M:%S')
+                print(type(post['post_time']))
                 post['projects'] = [project['project_name'] for project in projects]
-
+            
+            print("MADE IT AFTER POST LOOP")
             cursor.close()
             conn.close()
-            return jsonify(posts)
+            
+            print("RETURNING NOW: ", posts)
+            try:
+                return jsonify(posts)
+            except Exception as e:
+                print("jsonify error:", e)
+                return jsonify({"error": "failed to serialize"}), 500
     #     else:
     #         return jsonify({'error': 'Database connection error'}), 500
     except Exception as e:

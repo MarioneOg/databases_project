@@ -55,22 +55,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
         try {
             const response = await fetch(`/search-posts?${params.toString()}`);
-            const text = await response.text(); 
-            console.log("Raw response text:", text);
-
+        
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+        
             const data = await response.json();
             console.log("Parsed JSON:", data);
-
+        
             localStorage.setItem("lastQuery", JSON.stringify({
                 queryType: "post",
                 results: data
             }));
-
+        
             window.location.href = `/post-results?${params.toString()}`;
         } catch (err) {
             console.error("Failed to fetch results:", err);
             alert("An error occurred while querying the backend.");
         }
+        
     });
 });
   
