@@ -132,6 +132,19 @@ document.getElementById("submit-user").addEventListener("click", () => {
         const dislikes = document.getElementById("dislikes").value.trim();
         const repostLikes = document.getElementById("repost-likes").value.trim();
         const repostDislikes = document.getElementById("repost-dislikes").value.trim()
+
+        const originalPostTime = document.getElementById("post-time").value.trim();
+        const repostTime = document.getElementById("repost-time").value.trim();
+
+        if (repostTime && originalPostTime) {
+            const originalDate = new Date(originalPostTime);
+            const repostDate = new Date(repostTime);
+
+        if (repostDate < originalDate) {
+            alert("Repost time must be later than the original post time.");
+        return; // Stop form submission
+        }
+    }
     
         if (ageValue && (isNaN(ageValue) || Number(ageValue) < 0)) {
             alert("Age must be a non-negative number.");
@@ -149,12 +162,12 @@ document.getElementById("submit-user").addEventListener("click", () => {
         }
     
         if (repostLikes && (isNaN(repostLikes) || Number(repostLikes) < 0)) {
-            alert("Likes must be a non-negative number.");
+            alert("Repost likes must be a non-negative number.");
             return; // Stop form submission
         }
     
         if (repostDislikes && (isNaN(repostDislikes) || Number(repostDislikes) < 0)) {
-            alert("Dislikes must be a non-negative number.");
+            alert("Repost dislikes must be a non-negative number.");
             return; // Stop form submission
         }
     
