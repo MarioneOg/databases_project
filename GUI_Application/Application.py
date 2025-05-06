@@ -170,7 +170,7 @@ def check_institute(conn, institute_name):
 @app.route('/projects/add', methods=['GET', 'POST'])
 def add_project_form():
     if request.method == 'POST':
-        project_name = request.form['project_name']
+        project_name = request.form['project_name'].strip()
         manager_first_name = request.form['manager_first_name'] or None
         manager_last_name = request.form['manager_last_name'] or None
         institute_name = request.form['institute_name'] or None
@@ -382,7 +382,7 @@ def find_post(conn, username, social_media, post_time):
 @app.route('/analysis/add', methods=['GET', 'POST'])
 def add_analysis_form():
     if request.method == 'POST':
-        project_name = request.form['project_name']
+        project_name = request.form['project_name'].strip()
         username = request.form['username']
         social_media = request.form['social_media'].lower() 
         post_time_raw = request.form['post_time'] 
@@ -684,6 +684,37 @@ def add_user(conn, username, social_media, first_name, last_name, country_birth,
     conn.commit()
     cursor.close()
 
+@app.route('/user/add', methods=['GET', 'POST'])
+def add_user_form():
+    if request.method == 'POST':
+        username = request.form['username'].strip()
+        social_media = request.form['social_media'].lower().strip()
+        first_name = request.form['first_name'] or None
+        last_name = request.form['last_name'] or None
+        country_birth = request.form['country_birth'].lower() or None
+        country_residence = request.form['country_residence'].lower() or None
+        age = request.form['age'] or None
+        gender = request.form['gender'].lower() or None
+        verified = request.form['verified'] or None
+        
+        conn = get_db_connection()
+        if conn:
+            cursor = conn.cursor()
+            
+            add_social_media(conn, social_media)
+            add_user(conn, username, social_media, first_name, last_name, 
+                     country_birth, country_residence, age, gender, verified)
+            
+            cursor.close()
+            conn.close()
+            
+            flash("User added successfully", "success")
+            return redirect(url_for('entry'))
+        
+        flash("Database connection error", "danger")
+
+
+
 def add_post(conn, username, social_media, post_time, text, likes, dislikes, city, state, country, multimedia):
     cursor = conn.cursor()
 
@@ -925,8 +956,8 @@ def add_post_form():
     original = data['originalPost']
     repost = data['repost']
 
-    username = user['username']
-    social_media = user['social_media'].lower()
+    username = user['username'].strip()
+    social_media = user['social_media'].lower().strip()
     first_name = user.get('first_name') or None
     last_name = user.get('last_name') or None
     country_birth = user.get('country_birth').lower() or None

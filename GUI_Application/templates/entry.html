@@ -14,6 +14,7 @@
     <main>
         <div class="button-group">
             <button class="entry-button" id="project-btn">Add Project</button>
+            <button class="entry-button" id="user-btn">Add User</button>
             <button class="entry-button" id="posts-btn">Add Posts to Project</button>
             <button class="entry-button" id="analysis-btn">Add Analysis Result</button>
         </div>
@@ -29,8 +30,25 @@
             <input type="date" id="end-date" name="end_date" class="form-input" />
             <button id="submit-project" class="submit-btn">Add</button>
         </form>
-        
 
+        <form id="user-form" class="form-section hidden" method="POST" action="{{ url_for('add_user_form') }}">
+            <input type="text" id="username" name="username" placeholder="* Username" class="form-input" required/>
+            <input type="text" id="social-media" name="social_media" placeholder="* Social Media" class="form-input" required/>
+            <input type="text" id="first-name" name="first_name" placeholder="First Name" class="form-input" />
+            <input type="text" id="last-name" name="last_name" placeholder="Last Name" class="form-input" />
+            <input type="text" id="country-birth" name="country_birth" placeholder="Country of Birth" class="form-input" />
+            <input type="text" id="country-residence" name="country_residence" placeholder="Country of Residence" class="form-input" />
+            <input type="text" id="age" name="age" placeholder="Age" class="form-input" />
+            <input type="text" id="gender" name="gender" placeholder="Gender" class="form-input" />
+            <label for="verified">Verified:</label>
+            <select id="verified" name="verified" class="form-input">
+                <option value="">-Select-</option>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+            </select>
+            <button id="submit-user" class="submit-btn">Add</button>
+        </form>
+        
         <form id="post-form" class="form-section hidden" method="POST" action="{{ url_for('add_post_form') }}">
             <h3 class="form-subheader">Project</h3>
             <input type="text" id="post-project-name" name="project_name" placeholder="* Project Name" class="form-input" required />
@@ -114,10 +132,9 @@
     <nav class="navbar">
         <a href="{{ url_for('entry') }}" class="nav-button">Data Entry</a>
         <a href="{{ url_for('query') }}" class="nav-button">Query</a>
-        <a href="{{ url_for('results') }}" class="nav-button">Results</a>
     </nav>
 
-    <script src="{{ url_for('static', filename='js/entry.js') }}?v=8" defer></script>
+    <script src="{{ url_for('static', filename='js/entry.js') }}?v=11" defer></script>
 
 </body>
 </html>

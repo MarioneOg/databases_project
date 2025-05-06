@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
 const buttons = document.querySelectorAll('.entry-button');
 
 const projectForm = document.getElementById('project-form');
+const userForm = document.getElementById('user-form');
 const postForm = document.getElementById('post-form');
 const analysisForm = document.getElementById('analysis-form');
 
@@ -25,6 +26,8 @@ buttons.forEach(button => {
                 postForm.classList.remove('hidden');
             } else if (button.id === 'analysis-btn') {
                 analysisForm.classList.remove('hidden');
+            } else if (button.id === 'user-btn') {
+                userForm.classList.remove('hidden');
             }
         }
 
@@ -46,6 +49,47 @@ document.getElementById("submit-project").addEventListener("click", () => {
     console.log("Project submission:", projectData);
     
     fetch("/projects/add", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(postData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Network response was not ok");
+        }
+        return response.text();  // or .json() if your backend returns JSON
+    })
+    .then(data => {
+        console.log("Server response:", data);
+        alert("Project added successfully!");
+        window.location.href = "/entry";  // redirect if desired
+    })
+    .catch(error => {
+        console.error("Error submitting project:", error);
+        alert("Error submitting project.");
+    });
+});
+
+// Add user parameters
+document.getElementById("submit-user").addEventListener("click", () => {
+
+    const userInfo = {
+        username: document.getElementById("username").value.trim(),
+        social_media: document.getElementById("social-media").value.trim(),
+        first_name: document.getElementById("first-name").value.trim(),
+        last_name: document.getElementById("last-name").value.trim(),
+        country_birth: document.getElementById("country-birth").value.trim(),
+        country_residence: document.getElementById("country-residence").value.trim(),
+        age: document.getElementById("age").value.trim(),
+        gender: document.getElementById("gender").value.trim(),
+        verified: document.getElementById("verified").value.trim()
+    };
+
+    console.log("User submission:", projectData);
+    
+    fetch("/user/add", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -179,6 +223,29 @@ document.getElementById("submit-analysis").addEventListener("click", () => {
     };
 
     console.log("Analysis submission:", analysisData);
+
+    fetch("/analysis/add", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(postData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Network response was not ok");
+        }
+        return response.text();  // or .json() if your backend returns JSON
+    })
+    .then(data => {
+        console.log("Server response:", data);
+        alert("Post added successfully!");
+        window.location.href = "/entry";  // redirect if desired
+    })
+    .catch(error => {
+        console.error("Error submitting post:", error);
+        alert("Error submitting post.");
+    });
     // Backend connection goes here???
 });
 
