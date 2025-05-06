@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const userForm = document.getElementById('user-form');
     const postForm = document.getElementById('post-form');
     const analysisForm = document.getElementById('analysis-form');
+    const flashContainer = document.getElementById('flash-container');
     
     // Toggle visibility of text fields and selection
     buttons.forEach(button => {
@@ -17,6 +18,10 @@ document.addEventListener("DOMContentLoaded", () => {
             userForm.classList.add('hidden');  // Added this line to hide user form
             postForm.classList.add('hidden');
             analysisForm.classList.add('hidden');
+
+            if (flashContainer) {
+                flashContainer.style.display = 'none';
+            }
     
             if (!isSelected) {
                 button.classList.add('selected');
