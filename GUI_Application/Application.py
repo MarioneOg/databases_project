@@ -1162,6 +1162,7 @@ def add_post_form():
             add_project_post(conn, project_name, username, social_media, post_time)
 
         conn.close()
+        flash("Post submitted successfully!", "success")
         return jsonify({"message": "Post added successfully"}), 200
     
 

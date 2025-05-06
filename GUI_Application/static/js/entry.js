@@ -140,7 +140,7 @@ document.getElementById("submit-user").addEventListener("click", () => {
             const originalDate = new Date(originalPostTime);
             const repostDate = new Date(repostTime);
 
-        if (repostDate < originalDate) {
+        if (repostDate <= originalDate) {
             alert("Repost time must be later than the original post time.");
         return; // Stop form submission
         }
