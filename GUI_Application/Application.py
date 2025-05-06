@@ -645,6 +645,8 @@ def add_user(conn, username, social_media, first_name, last_name, country_birth,
         """, (username, social_media, first_name, last_name, country_birth,
               country_residence, age, gender, verified))
         conn.commit()
+        cursor.close()
+        return "User added successfully", "success"
     else:
         update_fields = []
         update_values = []
@@ -676,13 +678,12 @@ def add_user(conn, username, social_media, first_name, last_name, country_birth,
             """
             update_values.extend([username, social_media])
             cursor.execute(update_query, tuple(update_values))
-        else:
-            flash("User already exists", "danger")
+            conn.commit()
             cursor.close()
-            return redirect(url_for('entry'))
-        
-    conn.commit()
-    cursor.close()
+            return "User updated successfully", "success"
+        else:
+            cursor.close()
+            return "User already exists", "danger"
 
 @app.route('/user/add', methods=['GET', 'POST'])
 def add_user_form():
@@ -712,18 +713,17 @@ def add_user_form():
             cursor = conn.cursor()
             
             add_social_media(conn, social_media)
-            add_user(conn, username, social_media, first_name, last_name, 
+            message, status = add_user(conn, username, social_media, first_name, last_name, 
                      country_birth, country_residence, age, gender, verified)
             
             cursor.close()
             conn.close()
             
-            flash("User added successfully", "success")
+            flash(message, status)
             return redirect(url_for('entry'))
         
         flash("Database connection error", "danger")
-
-
+        return redirect(url_for('entry'))
 
 def add_post(conn, username, social_media, post_time, text, likes, dislikes, city, state, country, multimedia):
     cursor = conn.cursor()
