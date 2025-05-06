@@ -1381,7 +1381,7 @@ def query_posts():
     conn = get_db_connection()
     if conn:
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT media_name FROM social_media")
+        cursor.execute("SELECT name FROM social_media")
         social_media = cursor.fetchall()
         cursor.close()
         conn.close()
@@ -1391,19 +1391,35 @@ def query_posts():
     return redirect(url_for('index'))
 
 from flask import jsonify
+from datetime import datetime
 @app.route('/search-posts', methods=['GET'])
 def search_posts():
     try:
-        username = request.args.get('username')
-        media_name = request.args.get('social_media').lower()
-        start_date = request.args.get('start_date')
-        end_date = request.args.get('end_date')
+        username = request.args.get('username') or None
+        media_name_raw = request.args.get('social_media') or None
+        media_name = None
+        if media_name_raw:
+            media_name = media_name_raw.lower()
+        start_date = request.args.get('start_date') or None
+        end_date = request.args.get('end_date') or None
         # post_time_raw = request.args.get('post_time')
         # post_time = None
         # if post_time_raw:
         #     post_time = post_time_raw.replace('T', ' ') + ":00"
-        first_name = request.args.get('first_name')
-        last_name = request.args.get('last_name')
+        first_name = request.args.get('first_name') or None
+        last_name = request.args.get('last_name') or None
+
+        if start_date:
+            start_date_check = datetime.strptime(start_date, "%Y-%m-%d").date()
+
+        if end_date:
+            end_date_check = datetime.strptime(end_date, "%Y-%m-%d").date()
+
+        if start_date and end_date:
+            if start_date_check > end_date_check:
+                flash("Start date must be before end date", "danger")
+                return redirect(url_for('search_posts'))
+
 
         query_params = {
             'username': username,
