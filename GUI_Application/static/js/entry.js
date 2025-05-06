@@ -98,14 +98,14 @@ document.getElementById("submit-user").addEventListener("click", () => {
         verified: document.getElementById("user-verified").value.trim()
     };
 
-    console.log("User submission:", projectData);
+    console.log("User submission:", userInfo);
     
     fetch("/user/add", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(userData)
+        body: JSON.stringify(userInfo)
     })
     .then(response => {
         if (!response.ok) {
