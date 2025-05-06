@@ -53,7 +53,7 @@ document.getElementById("submit-project").addEventListener("click", () => {
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(postData)
+        body: JSON.stringify(projectData)
     })
     .then(response => {
         if (!response.ok) {
@@ -74,17 +74,23 @@ document.getElementById("submit-project").addEventListener("click", () => {
 
 // Add user parameters
 document.getElementById("submit-user").addEventListener("click", () => {
+    const ageValue = document.getElementById("age").value.trim();
+
+    if (isNaN(ageValue) || Number(ageValue) < 0) {
+        alert("Age must be a non-negative number.");
+        return; // Stop form submission
+    }
 
     const userInfo = {
-        username: document.getElementById("username").value.trim(),
-        social_media: document.getElementById("social-media").value.trim(),
-        first_name: document.getElementById("first-name").value.trim(),
-        last_name: document.getElementById("last-name").value.trim(),
-        country_birth: document.getElementById("country-birth").value.trim(),
-        country_residence: document.getElementById("country-residence").value.trim(),
-        age: document.getElementById("age").value.trim(),
-        gender: document.getElementById("gender").value.trim(),
-        verified: document.getElementById("verified").value.trim()
+        username: document.getElementById("user-username").value.trim(),
+        social_media: document.getElementById("user-social-media").value.trim(),
+        first_name: document.getElementById("user-first-name").value.trim(),
+        last_name: document.getElementById("user-last-name").value.trim(),
+        country_birth: document.getElementById("user-country-birth").value.trim(),
+        country_residence: document.getElementById("user-country-residence").value.trim(),
+        age: document.getElementById("user-age").value.trim(),
+        gender: document.getElementById("user-gender").value.trim(),
+        verified: document.getElementById("user-verified").value.trim()
     };
 
     console.log("User submission:", projectData);
@@ -94,7 +100,7 @@ document.getElementById("submit-user").addEventListener("click", () => {
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(postData)
+        body: JSON.stringify(userData)
     })
     .then(response => {
         if (!response.ok) {
@@ -229,7 +235,7 @@ document.getElementById("submit-analysis").addEventListener("click", () => {
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(postData)
+        body: JSON.stringify(analysisData)
     })
     .then(response => {
         if (!response.ok) {

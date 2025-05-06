@@ -694,6 +694,15 @@ def add_user_form():
         country_birth = request.form['country_birth'].lower() or None
         country_residence = request.form['country_residence'].lower() or None
         age = request.form['age'] or None
+        try:
+            ageInt = int(age)
+            if ageInt < 0:
+                flash("Age must be a positive integer, try again", "danger")
+                return redirect(url_for('entry'))
+        except ValueError:
+            flash("Age must be a positive integer, try again", "danger")
+            return redirect(url_for('entry'))
+
         gender = request.form['gender'].lower() or None
         verified = request.form['verified'] or None
         
@@ -944,6 +953,19 @@ def add_project_post(conn, project_name, username, social_media, post_time):
     conn.commit()
     cursor.close()
 
+def add_project(conn, project_name):
+    cursor = conn.cursor()
+
+    # Check if project exists
+    cursor.execute("SELECT name FROM Project WHERE name = %s", (project_name,))
+    check_project = cursor.fetchone()
+
+    if not check_project:
+        cursor.execute("INSERT INTO Project (name) VALUES (%s)", (project_name,))
+        conn.commit()
+
+    cursor.close()
+
 from flask import jsonify, request
 
 @app.route('/posts/add', methods=['POST'])
@@ -951,7 +973,7 @@ def add_post_form():
     data = request.get_json()
     print("JSON: ", data)
 
-    project_name = data['project_name']
+    project_name = data['project_name'] or None
     user = data['userInfo']
     original = data['originalPost']
     repost = data['repost']
@@ -999,16 +1021,10 @@ def add_post_form():
                 return jsonify({"error": "Repost time cannot be at or before original post time"}), 400
 
     conn = get_db_connection()
+    print("\nHERE")
     if conn:
         cursor = conn.cursor()
 
-        # Check if project exists
-        cursor.execute("SELECT name FROM Project WHERE name = %s", (project_name,))
-        check_project = cursor.fetchone()
-
-        if not check_project:
-            conn.close()
-            return jsonify({"error": f"Project {project_name} not found"}), 400
 
         # Add to tables
         add_social_media(conn, social_media)
@@ -1022,7 +1038,9 @@ def add_post_form():
                        repost_likes, repost_dislikes, repost_multimedia,
                        username, social_media, post_time)
             add_project_post(conn, project_name, repost_username, repost_social_media, repost_time)
-        add_project_post(conn, project_name, username, social_media, post_time)
+        if project_name:
+            add_project(conn, project_name)
+            add_project_post(conn, project_name, username, social_media, post_time)
 
         conn.close()
         return jsonify({"message": "Post added successfully"}), 200
