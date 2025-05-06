@@ -1046,6 +1046,7 @@ def add_post_form():
 
         conn.close()
         return jsonify({"message": "Post added successfully"}), 200
+    
 
     return jsonify({"error": "Database connection error"}), 500
 
