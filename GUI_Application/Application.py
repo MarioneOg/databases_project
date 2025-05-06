@@ -932,8 +932,6 @@ def add_post_form():
     country_birth = user.get('country_birth').lower() or None
     country_residence = user.get('country_residence').lower() or None
     age = user.get('age') or None
-    if age and age < 0:
-        flash("Age cannot be negative", "danger")
     gender = user.get('gender').lower() or None
     verified = user.get('verified') or None
 
@@ -941,11 +939,7 @@ def add_post_form():
     post_time = post_time_raw.replace('T', ' ') + ":00"
     text = original.get('post_text') or None
     likes = original.get('post_likes') or None
-    if likes and likes < 0:
-        flash("Likes cannot be negative", "danger")
     dislikes = original.get('post_dislikes') or None
-    if dislikes and dislikes < 0:
-        flash("Dislikes cannot be negative", "danger")
     city = original.get('post_city').lower() or None
     state = original.get('post_state').lower() or None
     country = original.get('post_country').lower() or None
@@ -961,11 +955,7 @@ def add_post_form():
     repost_state = repost.get('repost_state').lower() or None
     repost_country = repost.get('repost_country').lower() or None
     repost_likes = repost.get('repost_likes') or None
-    if repost_likes and repost_likes < 0:
-        flash("Repost likes cannot be negative", "danger")
     repost_dislikes = repost.get('repost_dislikes') or None
-    if repost_dislikes and repost_dislikes < 0:
-        flash("Repost dislikes cannot be negative", "danger")
     repost_multimedia = repost.get('repost_multimedia') or None
 
     conn = get_db_connection()

@@ -73,9 +73,33 @@ document.getElementById("submit-project").addEventListener("click", () => {
     document.getElementById("submit-post").addEventListener("click", (event) => {
         event.preventDefault(); 
         const ageValue = document.getElementById("age").value.trim();
+        const likes = document.getElementById("likes").value.trim();
+        const dislikes =document.getElementById("dislikes").value.trim();
+        const repostLikes = document.getElementById("repost-likes").value.trim();
+        const repostDislikes = document.getElementById("repost-dislikes").value.trim()
 
         if (isNaN(ageValue) || Number(ageValue) < 0) {
             alert("Age must be a non-negative number.");
+            return; // Stop form submission
+        }
+
+        if (isNaN(likes) || Number(likes) < 0) {
+            alert("Likes must be a non-negative number.");
+            return; // Stop form submission
+        }
+
+        if (isNaN(dislikes) || Number(dislikes) < 0) {
+            alert("Dislikes must be a non-negative number.");
+            return; // Stop form submission
+        }
+
+        if (isNaN(repostLikes) || Number(repostLikes) < 0) {
+            alert("Likes must be a non-negative number.");
+            return; // Stop form submission
+        }
+
+        if (isNaN(repostDislikes) || Number(repostDislikes) < 0) {
+            alert("Dislikes must be a non-negative number.");
             return; // Stop form submission
         }
 
