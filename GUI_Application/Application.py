@@ -1479,7 +1479,7 @@ def search_posts():
         if start_date and end_date:
             if start_date_check > end_date_check:
                 flash("Start date must be before end date", "danger")
-                return redirect(url_for('search_posts'))
+                return redirect(url_for('query'))
 
 
         query_params = {

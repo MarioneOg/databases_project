@@ -5,6 +5,7 @@ const buttons = document.querySelectorAll('.entry-button');
 
 const postForm = document.getElementById('post-form');
 const experimentForm = document.getElementById('experiment-form');
+const flashContainer = document.getElementById('flash-container');
 
 // Toggle visibility of text fields and selection
 buttons.forEach(button => {
@@ -15,6 +16,10 @@ buttons.forEach(button => {
   
         postForm.classList.add('hidden');
         experimentForm.classList.add('hidden');
+
+        if (flashContainer) {
+            flashContainer.style.display = 'none';
+        }
   
         if (!isSelected) {
             button.classList.add('selected');
