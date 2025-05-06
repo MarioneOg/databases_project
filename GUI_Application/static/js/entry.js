@@ -38,12 +38,12 @@ buttons.forEach(button => {
 // Add project parameters
 document.getElementById("submit-project").addEventListener("click", () => {
     const projectData = {
-        projectName: document.getElementById("project-name").value.trim(),
-        managerFirst: document.getElementById("manager-first-name").value.trim(),
-        managerLast: document.getElementById("manager-last-name").value.trim(),
+        project_name: document.getElementById("project-name").value.trim(),
+        manager_first_name: document.getElementById("manager-first-name").value.trim(),
+        manager_last_name: document.getElementById("manager-last-name").value.trim(),
         institute: document.getElementById("institute-name").value.trim(),
-        startDate: document.getElementById("start-date").value.trim(),
-        endDate: document.getElementById("end-date").value.trim()
+        start_date: document.getElementById("start-date").value.trim(),
+        end_date: document.getElementById("end-date").value.trim()
     };
 
     console.log("Project submission:", projectData);
@@ -64,12 +64,13 @@ document.getElementById("submit-project").addEventListener("click", () => {
     .then(data => {
         console.log("Server response:", data);
         alert("Project added successfully!");
-        window.location.href = "/entry";  // redirect if desired
+        window.location.href = "/entry";
     })
-    .catch(error => {
-        console.error("Error submitting project:", error);
-        alert("Error submitting project.");
-    });
+    
+    // .catch(error => {
+    //     console.error("Error submitting project:", error);
+    //     alert("Error submitting project.");
+    // });
 });
 
 // Add user parameters

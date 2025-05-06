@@ -170,12 +170,12 @@ def check_institute(conn, institute_name):
 @app.route('/projects/add', methods=['GET', 'POST'])
 def add_project_form():
     if request.method == 'POST':
-        project_name = request.form['project_name'].strip()
-        manager_first_name = request.form['manager_first_name'] or None
-        manager_last_name = request.form['manager_last_name'] or None
-        institute_name = request.form['institute_name'] or None
-        start_date = request.form['start_date'] or None
-        end_date = request.form['end_date'] or None
+        project_name = request.form.get('project_name').strip()
+        manager_first_name = request.form.get('manager_first_name') or None
+        manager_last_name = request.form.get('manager_last_name') or None
+        institute_name = request.form.get('institute_name') or None
+        start_date = request.form.get('start_date') or None
+        end_date = request.form.get('end_date') or None
 
         if start_date and end_date and start_date > end_date:
             flash("Start date cannot be after end date", "danger")
@@ -694,14 +694,15 @@ def add_user_form():
         country_birth = request.form['country_birth'].lower() or None
         country_residence = request.form['country_residence'].lower() or None
         age = request.form['age'] or None
-        try:
-            ageInt = int(age)
-            if ageInt < 0:
+        if age:
+            try:
+                ageInt = int(age)
+                if ageInt < 0:
+                    flash("Age must be a positive integer, try again", "danger")
+                    return redirect(url_for('entry'))
+            except ValueError:
                 flash("Age must be a positive integer, try again", "danger")
                 return redirect(url_for('entry'))
-        except ValueError:
-            flash("Age must be a positive integer, try again", "danger")
-            return redirect(url_for('entry'))
 
         gender = request.form['gender'].lower() or None
         verified = request.form['verified'] or None
@@ -1037,7 +1038,8 @@ def add_post_form():
                        repost_city, repost_state, repost_country,
                        repost_likes, repost_dislikes, repost_multimedia,
                        username, social_media, post_time)
-            add_project_post(conn, project_name, repost_username, repost_social_media, repost_time)
+            if project_name:
+                add_project_post(conn, project_name, repost_username, repost_social_media, repost_time)
         if project_name:
             add_project(conn, project_name)
             add_project_post(conn, project_name, username, social_media, post_time)
