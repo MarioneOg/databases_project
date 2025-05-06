@@ -1396,23 +1396,26 @@ def search_posts():
     try:
         username = request.args.get('username')
         media_name = request.args.get('social_media').lower()
-        post_time_raw = request.args.get('post_time')
-        post_time = None
-        if post_time_raw:
-            post_time = post_time_raw.replace('T', ' ') + ":00"
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
+        # post_time_raw = request.args.get('post_time')
+        # post_time = None
+        # if post_time_raw:
+        #     post_time = post_time_raw.replace('T', ' ') + ":00"
         first_name = request.args.get('first_name')
         last_name = request.args.get('last_name')
 
         query_params = {
             'username': username,
             'social_media': media_name,
-            'post_time': post_time,
+            'start_date': start_date,
+            'end_date': end_date,
             'first_name': first_name,
             'last_name': last_name
         }
 
         # Log the incoming parameters to check what's being passed
-        print(f"Received parameters - username: {username}, social_media: {media_name}, post_time: {post_time}, first_name: {first_name}, last_name: {last_name}")
+        print(f"Received parameters - username: {username}, social_media: {media_name}, start_date: {start_date}, end_date: {end_date} first_name: {first_name}, last_name: {last_name}")
 
         query = """
             SELECT p.text, sm.name AS social_media, u.username, p.post_time
@@ -1427,9 +1430,13 @@ def search_posts():
             query += " AND sm.name = %s"
             params.append(media_name)
 
-        if post_time:
-            query += " AND p.post_time = %s"
-            params.append(post_time)
+        if start_date:
+            query += " AND p.post_time >= %s"
+            params.append(start_date)
+        
+        if end_date:
+            query += " AND p.post_time <= %s"
+            params.append(end_date)
 
         if username:
             query += " AND u.username = %s"
