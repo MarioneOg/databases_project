@@ -958,6 +958,15 @@ def add_post_form():
     repost_dislikes = repost.get('repost_dislikes') or None
     repost_multimedia = repost.get('repost_multimedia') or None
 
+    if repost_username or repost_social_media or repost_time:
+        if not (repost_username and repost_social_media and repost_time):
+            return jsonify({"error": "Repost data is incomplete"}), 400
+        else:
+            repost_time_check = datetime.strptime(repost_time, '%Y-%m-%d %H:%M:%S')
+            post_time_check = datetime.strptime(post_time, '%Y-%m-%d %H:%M:%S')
+            if repost_time_check <= post_time_check:
+                return jsonify({"error": "Repost time cannot be at or before original post time"}), 400
+
     conn = get_db_connection()
     if conn:
         cursor = conn.cursor()
@@ -981,6 +990,7 @@ def add_post_form():
                        repost_city, repost_state, repost_country,
                        repost_likes, repost_dislikes, repost_multimedia,
                        username, social_media, post_time)
+            add_project_post(conn, project_name, repost_username, repost_social_media, repost_time)
         add_project_post(conn, project_name, username, social_media, post_time)
 
         conn.close()
