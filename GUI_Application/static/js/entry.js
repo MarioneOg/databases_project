@@ -214,37 +214,54 @@ document.getElementById("submit-user").addEventListener("click", () => {
             window.location.href = "/entry";
         });
     });
-    
+
     // Add analysis parameters
-    document.getElementById("submit-analysis").addEventListener("click", () => {
-        const analysisData = {
-            projectName: document.getElementById("analysis-project-name").value.trim(),
-            postUsername: document.getElementById("username").value.trim(),
-            socialMedia: document.getElementById("social-media").value.trim(),
-            timeOfPost: document.getElementById("post-time").value.trim(),
-            fieldName: document.getElementById("field-name").value.trim(),
-            result: document.getElementById("analysis").value.trim()  // Fixed typo here (document was misspelled)
-        };
+    document.getElementById("submit-analysis").addEventListener("click", (event) => {
+    event.preventDefault();
     
-        console.log("Analysis submission:", analysisData);
+    // Get form data with the correct IDs
+    const projectName = document.getElementById("analysis-project-name").value.trim();
+    const username = document.getElementById("analysis-username").value.trim();
+    const socialMedia = document.getElementById("analysis-social-media").value.trim();
+    const postTime = document.getElementById("analysis-post-time").value.trim();
+    const fieldName = document.getElementById("analysis-field-name").value.trim();
+    const analysis = document.getElementById("analysis-result").value.trim();
     
-        fetch("/analysis/add", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(analysisData)
-        })
-        .then(response => {
-            // Always redirect to entry page regardless of response status
-            window.location.href = "/entry";
-            return null;
-        })
-        .catch(error => {
-            console.error("Error submitting analysis:", error);
-            // Instead of showing alert, just redirect to see the flash message
-            window.location.href = "/entry";
-        });
+    // Validate required fields
+    if (!projectName) {
+        alert("Project name is required");
+        return;
+    }
+    
+    if (!username) {
+        alert("Username is required");
+        return;
+    }
+    
+    if (!socialMedia) {
+        alert("Social media is required");
+        return;
+    }
+    
+    if (!postTime) {
+        alert("Post time is required");
+        return;
+    }
+    
+    if (!fieldName) {
+        alert("Field name is required");
+        return;
+    }
+    
+    console.log("Analysis submission:", {
+        project_name: projectName,
+        username: username,
+        social_media: socialMedia,
+        post_time: postTime,
+        field_name: fieldName,
+        analysis: analysis
     });
     
+    document.getElementById("analysis-form").submit();
+});
     });

@@ -106,12 +106,12 @@
 
         <form id="analysis-form" class="form-section hidden" method="POST" action="{{ url_for('add_analysis_form') }}">
             <input type="text" id="analysis-project-name" name="project_name" placeholder="* Project Name" class="form-input" required/>
-            <input type="text" id="username" name="username" placeholder="* Post Username" class="form-input" required/>
-            <input type="text" id="social-media" name="social_media" placeholder="* Post Social Media" class="form-input" required />
-            <input type="datetime-local" id="post-time" name="post_time" class="form-input" required />
-            <input type="text" id="field-name" name="field_name" placeholder="* Field Name" class="form-input" required />
-            <input type="text" id="analysis" name="analysis" placeholder="Analysis / Result" class="form-input" />
-            <button id="submit-analysis" class="submit-btn">Add</button>
+            <input type="text" id="analysis-username" name="username" placeholder="* Post Username" class="form-input" required/>
+            <input type="text" id="analysis-social-media" name="social_media" placeholder="* Post Social Media" class="form-input" required />
+            <input type="datetime-local" id="analysis-post-time" name="post_time" class="form-input" required />
+            <input type="text" id="analysis-field-name" name="field_name" placeholder="* Field Name" class="form-input" required />
+            <input type="text" id="analysis-result" name="analysis" placeholder="Analysis / Result" class="form-input" />
+            <button type="submit" id="submit-analysis" class="submit-btn">Add</button>
         </form>
 
           

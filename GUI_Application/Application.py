@@ -382,41 +382,158 @@ def find_post(conn, username, social_media, post_time):
 @app.route('/analysis/add', methods=['GET', 'POST'])
 def add_analysis_form():
     if request.method == 'POST':
-        project_name = request.form['project_name'].strip()
-        username = request.form['username']
-        social_media = request.form['social_media'].lower() 
-        post_time_raw = request.form['post_time'] 
-        post_time = post_time_raw.replace('T', ' ') + ":00"
-        field_name = request.form['field_name'].lower()
-        analysis = request.form['analysis'] or None
-
-        conn = get_db_connection()
-        if conn:
-            cursor = conn.cursor()
-
-            project = find_project(conn, project_name)
-            user = find_user(conn, username, social_media)
-            post = find_post(conn, username, social_media, post_time)
-
-            if project and user and post:
-                # Add field
-                add_field(conn, field_name, project_name)
+        # Debug: Print all form data received
+        print("Form data received:", request.form)
+        
+        try:
+            # Get form data
+            project_name = request.form.get('project_name', '').strip()
+            username = request.form.get('username', '').strip()
+            social_media = request.form.get('social_media', '').strip().lower()
+            post_time_raw = request.form.get('post_time', '')
+            field_name = request.form.get('field_name', '').strip().lower()
+            analysis = request.form.get('analysis', None)
+            
+            # Validate required fields
+            if not project_name:
+                flash("Project name is required", "danger")
+                return redirect(url_for('entry'))
                 
-                # Add analysis
-                add_analysis(conn, project_name, username, social_media, post_time, field_name, analysis)
-
-                flash("Analysis added successfully", "success")
+            if not username:
+                flash("Username is required", "danger")
                 return redirect(url_for('entry'))
-            else:
-                flash("Project, user, or post not found", "danger")
+                
+            if not social_media:
+                flash("Social media is required", "danger")
+                return redirect(url_for('entry'))
+                
+            if not post_time_raw:
+                flash("Post time is required", "danger")
+                return redirect(url_for('entry'))
+                
+            if not field_name:
+                flash("Field name is required", "danger")
+                return redirect(url_for('entry'))
+            
+            # Format post time properly
+            post_time = post_time_raw.replace('T', ' ')
+            if len(post_time) <= 16:  # If time doesn't include seconds
+                post_time += ":00"
+                
+            print(f"Processing analysis form with data:")
+            print(f"Project: '{project_name}'")
+            print(f"Username: '{username}'")
+            print(f"Social Media: '{social_media}'")
+            print(f"Post Time: '{post_time}'")
+            print(f"Field: '{field_name}'")
+            print(f"Analysis: '{analysis}'")
+            
+            conn = get_db_connection()
+            if not conn:
+                flash("Database connection error", "danger")
+                return redirect(url_for('entry'))
+                
+            cursor = conn.cursor()
+            
+            # Check if project exists
+            cursor.execute("SELECT name FROM Project WHERE name = %s", (project_name,))
+            project = cursor.fetchone()
+            
+            if not project:
+                flash(f"Project '{project_name}' not found", "danger")
+                cursor.close()
+                conn.close()
+                return redirect(url_for('entry'))
+                
+            # Check if user exists
+            cursor.execute("SELECT username FROM User WHERE username = %s AND social_media = %s", 
+                        (username, social_media))
+            user = cursor.fetchone()
+            
+            if not user:
+                flash(f"User '{username}' on '{social_media}' not found", "danger")
+                cursor.close()
+                conn.close()
+                return redirect(url_for('entry'))
+                
+            # Check if post exists
+            cursor.execute("""
+                SELECT post_username FROM Post 
+                WHERE post_username = %s AND post_social_media = %s AND post_time = %s
+            """, (username, social_media, post_time))
+            post = cursor.fetchone()
+            
+            if not post:
+                flash(f"Post by '{username}' on '{social_media}' at '{post_time}' not found", "danger")
+                cursor.close()
+                conn.close()
                 return redirect(url_for('entry'))
 
-            # # Check if analysis exists
-            # cursor.execute("""
-            #     SELECT * FROM Analysis
-            #     WHERE project_name = %s AND post_username = %s AND post_social_media = %s AND post_time = %s AND field_name = %s
-            # """, (project_name, username, social_media, post_time, field_name))
-            # check_analysis = cursor.fetchone()
+            # Add field to project
+            try:
+                cursor.execute("""
+                    INSERT IGNORE INTO Field (field_name, project_name) 
+                    VALUES (%s, %s)
+                """, (field_name, project_name))
+                conn.commit()
+            except Exception as e:
+                print(f"Error adding field: {str(e)}")
+                flash(f"Error adding field: {str(e)}", "danger")
+                cursor.close()
+                conn.close()
+                return redirect(url_for('entry'))
+                
+            # Check if analysis already exists
+            cursor.execute("""
+                SELECT * FROM Analysis_Result 
+                WHERE project_name = %s 
+                  AND post_username = %s 
+                  AND post_social_media = %s 
+                  AND post_time = %s 
+                  AND field_name = %s
+            """, (project_name, username, social_media, post_time, field_name))
+            existing_analysis = cursor.fetchone()
+            
+            try:
+                if existing_analysis:
+                    # Update existing analysis
+                    cursor.execute("""
+                        UPDATE Analysis_Result
+                        SET analysis = %s
+                        WHERE project_name = %s 
+                          AND post_username = %s 
+                          AND post_social_media = %s 
+                          AND post_time = %s 
+                          AND field_name = %s
+                    """, (analysis, project_name, username, social_media, post_time, field_name))
+                    flash("Analysis updated successfully", "success")
+                else:
+                    # Insert new analysis
+                    cursor.execute("""
+                        INSERT INTO Analysis_Result 
+                        (project_name, post_username, post_social_media, post_time, field_name, analysis)
+                        VALUES (%s, %s, %s, %s, %s, %s)
+                    """, (project_name, username, social_media, post_time, field_name, analysis))
+                    flash("Analysis added successfully", "success")
+                
+                conn.commit()
+            except Exception as e:
+                conn.rollback()
+                print(f"Error saving analysis: {str(e)}")
+                flash(f"Error saving analysis: {str(e)}", "danger")
+            finally:
+                cursor.close()
+                conn.close()
+                
+            return redirect(url_for('entry'))
+                
+        except Exception as e:
+            print(f"Unexpected error: {str(e)}")
+            flash(f"An error occurred: {str(e)}", "danger")
+            return redirect(url_for('entry'))
+            
+    # GET request - redirect to entry form
+    return redirect(url_for('entry'))
 
 @app.route('/projects/<int:project_id>', methods=['GET'])
 def view_project(project_id):
