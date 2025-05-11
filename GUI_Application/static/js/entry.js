@@ -118,10 +118,10 @@ document.getElementById("submit-user").addEventListener("click", () => {
         alert("Project added successfully!");
         window.location.href = "/entry";  // redirect if desired
     })
-    .catch(error => {
-        console.error("Error submitting project:", error);
-        alert("Error submitting project.");
-    });
+    // .catch(error => {
+    //     console.error("Error submitting project:", error);
+    //     alert("Error submitting project.");
+    // });
 });
     
     // Add post parameters

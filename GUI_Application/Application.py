@@ -50,13 +50,29 @@ def get_db_connection():
 def connect_db():
     if request.method == 'POST':
         try:
-            conn = get_db_connection()
+            conn = mysql.connector.connect(
+                host="localhost",
+                user="myuser",
+                password="mypassword"
+            )
+
             if conn:
+                # cursor = conn.cursor()
+                # cursor.execute("SELECT 1")
+                # cursor.fetchall() 
+                # cursor.close()
+                # conn.close()
                 cursor = conn.cursor()
-                cursor.execute("SELECT 1")
-                cursor.fetchall() 
+
+                with open("GUI_Application/Schema.sql", "r") as f:
+                    sql = f.read()
+
+                for result in cursor.execute(sql, multi=True):
+                    pass
+
+                conn.commit()
                 cursor.close()
-                conn.close()
+
                 flash("Database connection successful", "success")
             else:
                 flash("Database connection failed", "danger")
