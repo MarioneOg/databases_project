@@ -1278,11 +1278,6 @@ def search_posts():
             print("THIS IS BEING RETURNED: ", posts)
             return render_template('post_results.html', query=query_params, posts=posts)
 
-        #     print("Returning posts: ", posts)
-        #     return jsonify(posts)  # Ensure a valid response is returned here
-        # else:
-        #     print("Error: No database connection")
-        #     return jsonify({'error': 'Database connection error'}), 500
 
     except Exception as e:
         import traceback

@@ -85,7 +85,6 @@
             </div>
         </div>
         
-        <!-- 필드 완성도 통계 카드 -->
         <div class="card">
             <div class="card-header">
                 <h4>Field Completion Statistics</h4>
@@ -99,12 +98,12 @@
                                     <h5 class="card-title">{{ field.field_name }}</h5>
                                     <p>Completion: {{ field_stats[field.field_name].percentage }}</p>
                                     
-                                    <!-- 백분율 값 추출 및 반올림 -->
+                                    
                                     {% set percentage_text = field_stats[field.field_name].percentage %}
                                     {% set percentage_value = percentage_text|replace('%', '')|float %}
                                     {% set rounded_percentage = ((percentage_value / 10)|round * 10)|int %}
                                     
-                                    <!-- 진행 표시줄 -->
+                                   
                                     <div class="progress">
                                         <div class="progress-bar w-{{ rounded_percentage }}" 
                                              role="progressbar"
@@ -122,7 +121,7 @@
             </div>
         </div>
         
-        <!-- 관련 포스트 카드 - post_results.html 스타일로 변경 -->
+        
         <div class="card">
             <div class="card-header">
                 <h4>Associated Posts ({{ posts|length }})</h4>
