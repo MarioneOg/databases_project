@@ -11,12 +11,13 @@
     <a href="{{ url_for('index') }}" class="home-button">Home</a>
     <header>
         <h1>Social Media Database</h1>
+        <h3>Please connect to the database before you use Data Entry or Query!</h3>
     </header>
 
     <main id="content">
         <!-- This space can be used dynamically with JavaScript or Flask includes -->
         <form method="POST" action="{{ url_for('connect_db') }}">
-            <button type="submit" class="submit-btn">Connect to Database</button>
+            <button type="submit" class="submit-btn" id="run-sql-btn">Connect to Database</button>
         </form>
     
         {% with messages = get_flashed_messages(with_categories=true) %}

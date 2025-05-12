@@ -7,4 +7,12 @@ function navigateTo(pageId) {
     document.getElementById(pageId).classList.add('active');
 }
 
+document.getElementById("run-sql-btn").addEventListener("click", () => {
+    fetch("/connect-db", { method: "POST" })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.status === "success" ? "Database initialized!" : "Error: " + data.message);
+        });
+});
+
 

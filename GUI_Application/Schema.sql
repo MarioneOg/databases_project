@@ -3,12 +3,12 @@ CREATE DATABASE IF NOT EXISTS social_media_analysis;
 USE social_media_analysis;
 
 -- SocialMedia
-CREATE TABLE Social_Media (
+CREATE TABLE IF NOT EXISTS Social_Media (
     name VARCHAR(100) PRIMARY KEY
 );
 
 -- User
-CREATE TABLE User (
+CREATE TABLE IF NOT EXISTS User (
     username VARCHAR(40),
     social_media VARCHAR(100),
     first_name VARCHAR(100),
@@ -23,7 +23,7 @@ CREATE TABLE User (
 );
 
 -- Post
-CREATE TABLE Post (
+CREATE TABLE IF NOT EXISTS Post (
     post_username VARCHAR(40),
     post_social_media VARCHAR(100),
     post_time DATETIME,
@@ -39,7 +39,7 @@ CREATE TABLE Post (
 );
 
 -- Repost
-CREATE TABLE Repost (
+CREATE TABLE IF NOT EXISTS Repost (
     original_post_username VARCHAR(40),
     original_social_media VARCHAR(100),
     original_post_time DATETIME,
@@ -60,12 +60,12 @@ CREATE TABLE Repost (
 );
 
 -- Institute
-CREATE TABLE Institute (
+CREATE TABLE IF NOT EXISTS Institute (
     name VARCHAR(200) PRIMARY KEY
 );
 
 -- Project
-CREATE TABLE Project (
+CREATE TABLE IF NOT EXISTS Project (
     name VARCHAR(200) PRIMARY KEY,
     manager_firstname VARCHAR(100),
     manager_lastname VARCHAR(100),
@@ -76,7 +76,7 @@ CREATE TABLE Project (
 );
 
 -- Field
-CREATE TABLE Field (
+CREATE TABLE IF NOT EXISTS Field (
     field_name VARCHAR(100),
     project_name VARCHAR(200),
     PRIMARY KEY (project_name, field_name),
@@ -84,7 +84,7 @@ CREATE TABLE Field (
 );
 
 -- Project_Post
-CREATE TABLE Project_Post (
+CREATE TABLE IF NOT EXISTS Project_Post (
     project_name VARCHAR(200),
     post_username VARCHAR(40),
     post_social_media VARCHAR(100),
@@ -96,7 +96,7 @@ CREATE TABLE Project_Post (
 );
 
 -- Analysis_Result
-CREATE TABLE Analysis_Result (
+CREATE TABLE IF NOT EXISTS Analysis_Result (
     project_name VARCHAR(200),
     post_username VARCHAR(40),
     post_social_media VARCHAR(100),
