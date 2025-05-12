@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!response.ok) {
                 throw new Error("Network response was not ok");
             }
-            return response.text();  // or .json() if your backend returns JSON
+            return response.text();  
         })
         .then(data => {
             console.log("Server response:", data);
@@ -71,10 +71,6 @@ document.addEventListener("DOMContentLoaded", () => {
             window.location.href = "/entry";
         })
         
-        // .catch(error => {
-        //     console.error("Error submitting project:", error);
-        //     alert("Error submitting project.");
-        // });
     });
     
     // Add user parameters
